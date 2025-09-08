@@ -335,3 +335,26 @@ export const DeviceProofPayloadSchema = z.object({
   hostname: z.string(),
   challenge: z.string().optional() // Original challenge if challenge-response
 });
+
+// ============================================================================
+// JWT Authentication Schemas (Phase 2)
+// ============================================================================
+
+export const AuthTokenResponseSchema = z.object({
+  authenticated: z.literal(true),
+  token: z.string(),          // JWT token (HS256)
+  expires_at: z.string(),     // ISO 8601 timestamp
+  device_id: z.string(),
+  fingerprint: z.string()
+});
+
+export const AuthClaimsSchema = z.object({
+  sub: z.string(),           // Device fingerprint (subject)
+  aud: z.string(),           // Device ID (audience)  
+  iat: z.number(),           // Issued at (Unix timestamp)
+  exp: z.number(),           // Expires at (Unix timestamp)
+  jti: z.string(),           // JWT ID (for replay prevention)
+  iss: z.literal('flingoos-session-manager'), // Issuer
+  device_id: z.string(),     // Device ID (for convenience)
+  fingerprint: z.string()    // Device fingerprint (for validation)
+});

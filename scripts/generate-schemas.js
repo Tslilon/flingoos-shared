@@ -133,6 +133,18 @@ const SCHEMA_EXPORTS = {
     schema: schemas.DeviceProofPayloadSchema,
     title: 'Device Proof Payload',
     description: 'Signed payload structure for device identity verification'
+  },
+  
+  // JWT authentication schemas (Phase 2)
+  'auth-token-response': {
+    schema: schemas.AuthTokenResponseSchema,
+    title: 'Auth Token Response',
+    description: 'JWT token response from successful device authentication'
+  },
+  'auth-claims': {
+    schema: schemas.AuthClaimsSchema,
+    title: 'Auth Claims',
+    description: 'JWT token claims structure for device-scoped authentication'
   }
 };
 

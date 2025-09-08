@@ -36,6 +36,15 @@ export type {
   BridgeCommandRequest,
   BridgeCommandResponse,
   
+  // Device authentication types
+  DeviceProofRequest,
+  DeviceProofResponse,
+  DeviceProofPayload,
+  
+  // JWT authentication types
+  AuthTokenResponse,
+  AuthClaims,
+  
   // Utility types
   Stage,
   SessionStatus,
@@ -74,5 +83,9 @@ export {
   // Device authentication schemas (Phase 1.5)
   DeviceProofRequestSchema,
   DeviceProofResponseSchema,
-  DeviceProofPayloadSchema
+  DeviceProofPayloadSchema,
+  
+  // JWT authentication schemas (Phase 2)
+  AuthTokenResponseSchema,
+  AuthClaimsSchema
 } from './schemas.js';

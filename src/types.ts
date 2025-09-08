@@ -114,3 +114,18 @@ export type FirestoreWorkflow = z.infer<typeof schemas.FirestoreWorkflowSchema>;
 
 // For backward compatibility
 export type Workflow = WorkflowData;
+
+// ============================================================================
+// Device Authentication Types (Phase 1.5)
+// ============================================================================
+
+export type DeviceProofRequest = z.infer<typeof schemas.DeviceProofRequestSchema>;
+export type DeviceProofResponse = z.infer<typeof schemas.DeviceProofResponseSchema>;
+export type DeviceProofPayload = z.infer<typeof schemas.DeviceProofPayloadSchema>;
+
+// ============================================================================
+// JWT Authentication Types (Phase 2)
+// ============================================================================
+
+export type AuthTokenResponse = z.infer<typeof schemas.AuthTokenResponseSchema>;
+export type AuthClaims = z.infer<typeof schemas.AuthClaimsSchema>;
