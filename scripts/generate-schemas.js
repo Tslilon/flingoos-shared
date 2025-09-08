@@ -116,6 +116,23 @@ const SCHEMA_EXPORTS = {
     schema: schemas.ErrorEnvelopeSchema,
     title: 'Error Envelope',
     description: 'Standardized error envelope for structured error handling'
+  },
+  
+  // Device authentication schemas (Phase 1.5)
+  'device-proof-request': {
+    schema: schemas.DeviceProofRequestSchema,
+    title: 'Device Proof Request',
+    description: 'Challenge request for device authentication with Ed25519 cryptographic proof'
+  },
+  'device-proof-response': {
+    schema: schemas.DeviceProofResponseSchema,
+    title: 'Device Proof Response',
+    description: 'Device cryptographic proof response with Ed25519 signature'
+  },
+  'device-proof-payload': {
+    schema: schemas.DeviceProofPayloadSchema,
+    title: 'Device Proof Payload',
+    description: 'Signed payload structure for device identity verification'
   }
 };
 

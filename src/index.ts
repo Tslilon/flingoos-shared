@@ -69,5 +69,10 @@ export {
   ForgeJobResponseSchema,
   BridgeCommandRequestSchema,
   StageExecutionSchema,
-  JobProgressSchema
+  JobProgressSchema,
+  
+  // Device authentication schemas (Phase 1.5)
+  DeviceProofRequestSchema,
+  DeviceProofResponseSchema,
+  DeviceProofPayloadSchema
 } from './schemas.js';

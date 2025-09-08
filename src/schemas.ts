@@ -307,3 +307,31 @@ export const FirestoreWorkflowSchema = z.object({
     retrieval_method: z.string()
   })
 });
+
+// ============================================================================
+// Device Authentication Schemas (Phase 1.5)
+// ============================================================================
+
+export const DeviceProofRequestSchema = z.object({
+  challenge: z.string(), // Base64 encoded challenge from Session Manager
+  timestamp: z.string()  // ISO 8601 timestamp
+});
+
+export const DeviceProofResponseSchema = z.object({
+  device_id: z.string(),
+  nonce: z.string(),       // 32-byte random nonce (hex encoded)
+  proof: z.string(),       // Ed25519 signature (hex encoded)
+  timestamp: z.string(),   // ISO 8601 timestamp
+  public_key: z.string(),  // Ed25519 public key (hex encoded)
+  hostname: z.string(),
+  bridge_version: z.string().optional()
+});
+
+export const DeviceProofPayloadSchema = z.object({
+  device_id: z.string(),
+  nonce: z.string(),
+  timestamp: z.string(),
+  bridge_version: z.string().optional(),
+  hostname: z.string(),
+  challenge: z.string().optional() // Original challenge if challenge-response
+});
