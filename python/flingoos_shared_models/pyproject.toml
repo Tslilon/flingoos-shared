@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flingoos-shared-models"
+version = "0.1.0"
+description = "Generated Pydantic models from @flingoos/shared JSON schemas"
+authors = [{name = "Flingoos", email = "dev@flingoos.com"}]
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0.0,<3.0.0",
+    "pydantic-core>=2.0.0",
+    "typing-extensions>=4.0.0"
+]
+keywords = ["pydantic", "models", "schemas", "flingoos", "validation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers", 
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+[project.urls]
+Homepage = "https://github.com/flingoos/flingoos-shared"
+Repository = "https://github.com/flingoos/flingoos-shared"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["flingoos_shared_models*"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"

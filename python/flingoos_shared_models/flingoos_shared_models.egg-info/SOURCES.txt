@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+flingoos_shared_models.egg-info/PKG-INFO
+flingoos_shared_models.egg-info/SOURCES.txt
+flingoos_shared_models.egg-info/dependency_links.txt
+flingoos_shared_models.egg-info/requires.txt
+flingoos_shared_models.egg-info/top_level.txt

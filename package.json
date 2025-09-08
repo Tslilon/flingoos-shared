@@ -13,22 +13,29 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:schemas": "npm run build && node scripts/generate-schemas.js",
     "validate": "npm run build && node dist/validation.js",
-    "test": "npm run validate",
-    "clean": "rm -rf dist"
+    "test": "npm run validate && npm run build:schemas",
+    "clean": "rm -rf dist python"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "zod": "^3.22.0"
+    "zod": "^3.22.0",
+    "zod-to-json-schema": "^3.24.6"
   },
   "files": [
     "dist/**/*",
     "README.md"
   ],
-  "keywords": ["types", "schemas", "validation", "flingoos"],
+  "keywords": [
+    "types",
+    "schemas",
+    "validation",
+    "flingoos"
+  ],
   "engines": {
     "node": ">=18.0.0"
   }
