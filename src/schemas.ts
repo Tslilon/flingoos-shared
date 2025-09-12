@@ -236,9 +236,9 @@ export const DeviceRecordSchema = z.object({
   paired_at: ISO8601TimestampSchema,
   last_heartbeat_at: ISO8601TimestampSchema,
   expires_at: ISO8601TimestampSchema,
-  available: z.boolean(), // Computed from last_heartbeat_at
-  stale: z.boolean() // Device hasn't sent heartbeat recently
-}).describe('Device record with org isolation');
+  available: z.boolean(), // Server-computed: last_heartbeat_at < 45s ago
+  stale: z.boolean() // Server-computed: last_heartbeat_at >= 30s ago (NOT stored)
+}).describe('Device record with org isolation - available/stale computed from last_heartbeat_at vs server time');
 
 export const UserDeviceLinkSchema = z.object({
   user_id: z.string().min(1),
@@ -281,17 +281,27 @@ export const SessionStartRequestSchema = z.object({
   session_options: z.record(z.any()).optional()
 }).describe('Request to POST /session/start with presence ticket');
 
-// Canonical Error Envelope (Phase 14)
+// Canonical Error Envelope (Phase 14) - CLOSED enum, fully documented
 export const ErrorEnvelopeSchema = z.object({
   code: z.enum([
-    'invalid_request', 'rate_limited', 'not_found', 'forbidden',
-    'ticket_expired', 'ticket_used', 'device_busy', 'upstream_error',
-    'config_error', 'sm_timeout', 'sm_network_error'
+    // Client errors (4xx)
+    'invalid_request',    // 400: Malformed request, validation failed
+    'forbidden',          // 403: Cross-org access, insufficient permissions
+    'not_found',          // 404: Resource not found (prevents existence leaks)
+    'rate_limited',       // 429: Rate limit exceeded, includes retry_after
+    'ticket_expired',     // 400: Presence/pairing ticket expired
+    'ticket_used',        // 400: Ticket already consumed (replay protection)
+    'device_busy',        // 409: Device has active session, includes TTL
+    // Server/infrastructure errors (5xx)
+    'upstream_error',     // 502: Session Manager response validation failed
+    'config_error',       // 500: Admin panel configuration error
+    'sm_timeout',         // 503: Session Manager request timeout
+    'sm_network_error'    // 503: Session Manager unreachable
   ]),
   http: z.number().int().min(400).max(599),
   message: z.string().min(1),
-  details: z.record(z.any()).optional()
-}).describe('Canonical error response envelope');
+  details: z.record(z.any()).optional() // Context: retry_after, device_id, ttl_seconds, etc.
+}).describe('Canonical error response envelope - CLOSED enum, no extensions allowed');
 
 // ============================================================================
 // Idempotency Schemas (confirmed from extracted headers)

@@ -1,0 +1,103 @@
+name: Contract Canary - Cross-Repo Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: flingoos-shared
+        
+    # Checkout dependent repos at the pinned commit
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/flingoos-session-manager
+        path: flingoos-session-manager
+        ref: main
+        
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/flingoos-admin-panel  
+        path: flingoos-admin-panel
+        ref: main
+        
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/flingoos-bridge
+        path: flingoos-bridge
+        ref: main
+
+    # Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: |
+          flingoos-shared/package-lock.json
+          flingoos-admin-panel/frontend/package-lock.json
+
+    # Setup Python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    # Build shared contracts
+    - name: Build shared contracts
+      working-directory: flingoos-shared
+      run: |
+        npm ci
+        npm run build:schemas
+        echo "::notice::Built $(ls dist/schema/*.json | wc -l) JSON schemas"
+
+    # Validate Session Manager can import schemas
+    - name: Test Session Manager integration
+      working-directory: flingoos-session-manager
+      run: |
+        pip install -e ../flingoos-shared/python/flingoos_shared_models
+        python -c "from flingoos_shared_models import DeviceRecord, ErrorEnvelope; print('✅ SM Python import success')"
+        
+    # Validate Admin Panel can import types
+    - name: Test Admin Panel integration
+      working-directory: flingoos-admin-panel/frontend
+      run: |
+        # Update to use current shared version
+        npm install --no-save ../../../flingoos-shared
+        npm run build
+        echo "✅ Admin Panel TypeScript build success"
+
+    # Round-trip validation: JSON Schema ↔ Pydantic
+    - name: Round-trip JSON Schema validation
+      working-directory: flingoos-shared
+      run: |
+        echo "Testing round-trip validation..."
+        node src/phase14-validation.js
+        echo "✅ All Phase 14 schemas validated"
+
+    # Contract commit validation
+    - name: Validate pinned commits
+      run: |
+        echo "Checking pinned shared commits..."
+        
+        SM_PIN=$(grep -o '@[a-f0-9]\{7\}' flingoos-session-manager/requirements_shared.txt | head -1 | cut -c2-)
+        ADMIN_PIN=$(node -pe "JSON.parse(require('fs').readFileSync('flingoos-admin-panel/frontend/package.json')).dependencies['@flingoos/shared']" | grep -o '#[a-f0-9]\{7\}' | cut -c2-)
+        CURRENT_SHA=$(cd flingoos-shared && git rev-parse --short HEAD)
+        
+        echo "Session Manager pin: $SM_PIN"  
+        echo "Admin Panel pin: $ADMIN_PIN"
+        echo "Current shared SHA: $CURRENT_SHA"
+        
+        if [[ "$SM_PIN" != "$CURRENT_SHA" ]] || [[ "$ADMIN_PIN" != "$CURRENT_SHA" ]]; then
+          echo "::error::SHA mismatch detected. Update pins to $CURRENT_SHA"
+          exit 1
+        fi
+        
+        echo "✅ All repos pinned to current shared commit"
