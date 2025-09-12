@@ -1,6 +1,6 @@
 {
   "name": "@flingoos/shared",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared types, schemas, and validation for Flingoos services - NO business logic",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

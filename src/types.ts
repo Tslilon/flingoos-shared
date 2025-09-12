@@ -90,7 +90,7 @@ export type JobProgress = z.infer<typeof schemas.JobProgressSchema>;
 // ============================================================================
 
 export type StandardErrorResponse = z.infer<typeof schemas.StandardErrorResponseSchema>;
-export type ErrorEnvelope = z.infer<typeof schemas.ErrorEnvelopeSchema>;
+// NOTE: ErrorEnvelope moved to Phase 14 section below
 
 // ============================================================================
 // Idempotency Types
@@ -129,3 +129,20 @@ export type DeviceProofPayload = z.infer<typeof schemas.DeviceProofPayloadSchema
 
 export type AuthTokenResponse = z.infer<typeof schemas.AuthTokenResponseSchema>;
 export type AuthClaims = z.infer<typeof schemas.AuthClaimsSchema>;
+
+// ============================================================================
+// Phase 14: Magic-Link Pairing + Presence Types
+// ============================================================================
+
+export type PairIntentResponse = z.infer<typeof schemas.PairIntentResponseSchema>;
+export type PairCompleteRequest = z.infer<typeof schemas.PairCompleteRequestSchema>;
+export type DeviceRecord = z.infer<typeof schemas.DeviceRecordSchema>;
+export type UserDeviceLink = z.infer<typeof schemas.UserDeviceLinkSchema>;
+export type UserDevicesResponse = z.infer<typeof schemas.UserDevicesResponseSchema>;
+export type PresenceIntentResponse = z.infer<typeof schemas.PresenceIntentResponseSchema>;
+export type PresenceCompleteRequest = z.infer<typeof schemas.PresenceCompleteRequestSchema>;
+export type PresenceStatusResponse = z.infer<typeof schemas.PresenceStatusResponseSchema>;
+export type SessionStartRequest = z.infer<typeof schemas.SessionStartRequestSchema>;
+
+// Updated canonical error envelope (replaces StandardErrorResponse)
+export type ErrorEnvelope = z.infer<typeof schemas.ErrorEnvelopeSchema>;

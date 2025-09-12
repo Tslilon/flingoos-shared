@@ -145,6 +145,53 @@ const SCHEMA_EXPORTS = {
     schema: schemas.AuthClaimsSchema,
     title: 'Auth Claims',
     description: 'JWT token claims structure for device-scoped authentication'
+  },
+  
+  // Phase 14: Magic-Link Pairing + Presence schemas
+  'pair-intent-response': {
+    schema: schemas.PairIntentResponseSchema,
+    title: 'Pair Intent Response',
+    description: 'Response from POST /user/devices/pair-intent with pairing token and deep link'
+  },
+  'pair-complete-request': {
+    schema: schemas.PairCompleteRequestSchema,
+    title: 'Pair Complete Request',
+    description: 'Request to POST /device/pair/complete with device cryptographic proof'
+  },
+  'device-record': {
+    schema: schemas.DeviceRecordSchema,
+    title: 'Device Record',
+    description: 'Device registration record with org isolation and availability status'
+  },
+  'user-device-link': {
+    schema: schemas.UserDeviceLinkSchema,
+    title: 'User Device Link',
+    description: 'Many-to-many user-device relationship with expiration'
+  },
+  'user-devices-response': {
+    schema: schemas.UserDevicesResponseSchema,
+    title: 'User Devices Response',
+    description: 'Paginated response from GET /user/devices with device availability'
+  },
+  'presence-intent-response': {
+    schema: schemas.PresenceIntentResponseSchema,
+    title: 'Presence Intent Response',
+    description: 'Response from POST /user/presence-intent with deep link and short code'
+  },
+  'presence-complete-request': {
+    schema: schemas.PresenceCompleteRequestSchema,
+    title: 'Presence Complete Request',
+    description: 'Request to POST /device/presence-complete confirming user approval'
+  },
+  'presence-status-response': {
+    schema: schemas.PresenceStatusResponseSchema,
+    title: 'Presence Status Response',
+    description: 'Polled response from GET /user/presence-status with presence ticket when ready'
+  },
+  'session-start-request': {
+    schema: schemas.SessionStartRequestSchema,
+    title: 'Session Start Request',
+    description: 'Request to POST /session/start using presence ticket from approval flow'
   }
 };
 

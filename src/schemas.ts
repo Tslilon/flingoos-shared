@@ -204,14 +204,94 @@ export const StandardErrorResponseSchema = z.object({
   error: z.string()
 });
 
-// Future: Standardized error envelope (pending confirmation)
+// ============================================================================
+// Phase 14: Magic-Link Pairing + Presence Schemas
+// ============================================================================
+
+// Common patterns for Phase 14
+const OpaqueTokenSchema = z.string().regex(/^[a-zA-Z0-9_-]{16,}$/, 'Invalid opaque token format');
+const ISO8601TimestampSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/, 'Invalid ISO-8601 timestamp with Z');
+const ShortCodeSchema = z.string().regex(/^\d{4}$/, 'Must be 4-digit code');
+const DeepLinkSchema = z.string().regex(/^flingoos-bridge:\/\//, 'Must be flingoos-bridge:// deep link');
+
+// Pairing Schemas
+export const PairIntentResponseSchema = z.object({
+  pairing_token: OpaqueTokenSchema,
+  deep_link: DeepLinkSchema,
+  expires_at: ISO8601TimestampSchema
+}).describe('Response from POST /user/devices/pair-intent');
+
+export const PairCompleteRequestSchema = z.object({
+  pairing_token: OpaqueTokenSchema,
+  device_proof: z.string().min(1) // Ed25519 signature proof
+}).describe('Request to POST /device/pair/complete');
+
+// Device Management Schemas
+export const DeviceRecordSchema = z.object({
+  fingerprint: OpaqueTokenSchema,
+  device_id: z.string().min(1), // Per-org derived device ID
+  org_id: z.string().min(1),
+  label: z.string().optional(),
+  paired_by: z.string().min(1), // user_id who paired
+  paired_at: ISO8601TimestampSchema,
+  last_heartbeat_at: ISO8601TimestampSchema,
+  expires_at: ISO8601TimestampSchema,
+  available: z.boolean(), // Computed from last_heartbeat_at
+  stale: z.boolean() // Device hasn't sent heartbeat recently
+}).describe('Device record with org isolation');
+
+export const UserDeviceLinkSchema = z.object({
+  user_id: z.string().min(1),
+  org_id: z.string().min(1),
+  fingerprint: OpaqueTokenSchema,
+  last_used_at: ISO8601TimestampSchema,
+  expires_at: ISO8601TimestampSchema
+}).describe('User-device link (m:m relationship)');
+
+export const UserDevicesResponseSchema = z.object({
+  devices: z.array(DeviceRecordSchema),
+  cursor: z.string().optional(),
+  has_more: z.boolean()
+}).describe('Paginated response from GET /user/devices');
+
+// Presence Schemas
+export const PresenceIntentResponseSchema = z.object({
+  presence_nonce: OpaqueTokenSchema,
+  deep_link: DeepLinkSchema,
+  short_code: ShortCodeSchema,
+  expires_at: ISO8601TimestampSchema
+}).describe('Response from POST /user/presence-intent');
+
+export const PresenceCompleteRequestSchema = z.object({
+  presence_nonce: OpaqueTokenSchema,
+  device_proof: z.string().min(1) // Ed25519 signature proof
+}).describe('Request to POST /device/presence-complete');
+
+export const PresenceStatusResponseSchema = z.object({
+  ready: z.boolean(),
+  presence_ticket: OpaqueTokenSchema.optional(), // Only when ready=true
+  expires_at: ISO8601TimestampSchema.optional(), // Ticket expiration
+  poll_after_ms: z.number().min(100).max(5000).optional(), // Server-controlled polling
+  now: ISO8601TimestampSchema // Server time for clock skew debugging
+}).describe('Response from GET /user/presence-status');
+
+// Session Schemas (Phase 14)
+export const SessionStartRequestSchema = z.object({
+  presence_ticket: OpaqueTokenSchema,
+  session_options: z.record(z.any()).optional()
+}).describe('Request to POST /session/start with presence ticket');
+
+// Canonical Error Envelope (Phase 14)
 export const ErrorEnvelopeSchema = z.object({
-  error_code: z.enum(['BRIDGE_DOWN', 'FORGE_TIMEOUT', 'INVALID_SESSION', 'PROCESSING_FAILED']),
-  error_message: z.string(),
-  correlation_id: z.string(),
-  timestamp: z.string(),
-  retry_after: z.number().optional()
-});
+  code: z.enum([
+    'invalid_request', 'rate_limited', 'not_found', 'forbidden',
+    'ticket_expired', 'ticket_used', 'device_busy', 'upstream_error',
+    'config_error', 'sm_timeout', 'sm_network_error'
+  ]),
+  http: z.number().int().min(400).max(599),
+  message: z.string().min(1),
+  details: z.record(z.any()).optional()
+}).describe('Canonical error response envelope');
 
 // ============================================================================
 // Idempotency Schemas (confirmed from extracted headers)
