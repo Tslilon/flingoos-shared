@@ -259,7 +259,8 @@ export const PresenceIntentResponseSchema = z.object({
   presence_nonce: OpaqueTokenSchema,
   deep_link: DeepLinkSchema,
   short_code: ShortCodeSchema,
-  expires_at: ISO8601TimestampSchema
+  expires_at: ISO8601TimestampSchema,
+  idempotency_key: z.string().min(1)
 }).describe('Response from POST /user/presence-intent');
 
 export const PresenceCompleteRequestSchema = z.object({
