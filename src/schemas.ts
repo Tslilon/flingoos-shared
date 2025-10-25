@@ -44,7 +44,8 @@ export const SessionStartResponseSchema = z.object({
   session_id: z.string().optional(),
   status: z.enum(SESSION_STATUSES).optional(),
   message: z.string().optional(),
-  error: z.string().optional()
+  error: z.string().optional(),
+  started_at: z.string().optional() // ISO-8601 with Z - for timer restoration
 });
 
 export const SessionStopResponseSchema = z.object({
@@ -52,7 +53,8 @@ export const SessionStopResponseSchema = z.object({
   session_id: z.string().optional(), 
   status: z.enum(SESSION_STATUSES).optional(),
   message: z.string().optional(),
-  error: z.string().optional()
+  error: z.string().optional(),
+  stopped_at: z.string().optional() // ISO-8601 with Z - when recording stopped
 });
 
 export const SessionStatusResponseSchema = z.object({
@@ -67,19 +69,52 @@ export const SessionStatusResponseSchema = z.object({
 // Session Internal State Schema
 // ============================================================================
 
+export const StageExecutionSchema = z.object({
+  stage: z.enum(STAGES),
+  status: z.enum(STAGE_EXECUTION_STATUSES),
+  started_at: z.string(),
+  completed_at: z.string().optional(),
+  error_message: z.string().nullable().optional(),
+  artifacts_produced: z.array(z.string())
+});
+
 export const SessionInternalStateSchema = z.object({
   session_id: z.string(),
-  start_time: z.string().optional(),
-  stop_time: z.string().optional(),
+  
+  // Timing fields (canonical naming)
+  started_at: z.string().optional(), // ISO-8601 with Z - canonical field
+  stopped_at: z.string().optional(), // ISO-8601 with Z - when stopped
+  start_time: z.string().optional(), // DEPRECATED: use started_at
+  stop_time: z.string().optional(),  // DEPRECATED: use stopped_at
+  
+  // Status fields
   status: z.enum(SESSION_STATUSES),
-  bridge_response: z.record(z.any()).optional(),
-  bridge_stop_response: z.record(z.any()).optional(), 
-  workflow_ready: z.boolean().optional(),
-  processing_id: z.string().optional(),
+  processing_status: z.string().optional(),
+  last_checked: z.string().optional(), // Server timestamp for clock skew detection
+  
+  // Device identification
+  device_id: z.string().optional(),
+  device_fingerprint: z.string().optional(),
+  
+  // Processing state (when status = "processing")
+  current_stage: z.enum(STAGES).optional(), // Current Forge stage
+  progress_percent: z.number().min(0).max(100).optional(),
+  stage_executions: z.array(StageExecutionSchema).optional(),
+  
+  // Completion state (when status = "completed")
   firestore_path: z.string().optional(),
-  workflow_id: z.string().optional(),
+  processing_id: z.string().optional(),
+  completed_at: z.string().optional(),
+  workflow_ready: z.boolean().optional(),
   processing_time_seconds: z.number().optional(),
-  error_message: z.string().optional()
+  
+  // Error state (when status = "failed")
+  error_message: z.string().optional(),
+  
+  // Legacy fields (keep for backward compatibility)
+  bridge_response: z.record(z.any()).optional(),
+  bridge_stop_response: z.record(z.any()).optional(),
+  workflow_id: z.string().optional()
 });
 
 // ============================================================================
@@ -104,15 +139,6 @@ export const ForgeCountersSchema = z.object({
   timeline_entries: z.number(), 
   llm_tokens_used: z.number(),
   processing_time_seconds: z.number()
-});
-
-export const StageExecutionSchema = z.object({
-  stage: z.enum(STAGES),
-  status: z.enum(STAGE_EXECUTION_STATUSES),
-  started_at: z.string(),
-  completed_at: z.string().optional(),
-  error_message: z.string().nullable().optional(),
-  artifacts_produced: z.array(z.string())
 });
 
 export const ForgeManifestSchema = z.object({
@@ -161,7 +187,11 @@ export const TriggerSessionSchema = z.object({
     start: z.string(),
     end: z.string()
   }),
-  timezone: z.string()
+  timezone: z.string(),
+  // Session and user identification
+  session_id: z.string(),
+  user_id: z.string(),
+  user_email: z.string()
 });
 
 export const TriggerOptionsSchema = z.object({
@@ -176,7 +206,8 @@ export const ForgeTriggerSchema = z.object({
   config_path: z.string(),
   session: TriggerSessionSchema,
   options: TriggerOptionsSchema,
-  visibility: z.enum(['private', 'public'])
+  visibility: z.enum(['private', 'public']),
+  source: z.enum(['on-demand', 'scheduled', 'batch']).default('on-demand')
 });
 
 // ============================================================================
