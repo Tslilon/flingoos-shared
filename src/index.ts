@@ -11,6 +11,7 @@ export * from './types.js';
 export * from './schemas.js';
 export * from './validation.js';
 export * from './stage-messages.js';
+export * from './video-artifacts.js';
 
 // Named exports for specific use cases
 export {
