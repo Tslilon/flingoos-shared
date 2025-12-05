@@ -93,13 +93,17 @@ cd flingoos-shared && npm run build
 | Artifact Type | Component Files |
 |--------------|-----------------|
 | Workflow Guide | `VideoWorkflowView.tsx`, `WorkflowPhasesDisplay.tsx` |
-| Knowledge Base | `VideoTeachingView.tsx` |
+| Knowledge Base | `VideoTeachingView.tsx`, `AddKnowledgeItemDialog.tsx` |
 | Flowchart | `WorkflowFlowchart.tsx`, `flowchart/CustomNode.tsx` |
 
 **What to change:**
 - Remove/add field rendering
 - Update optional chaining if field becomes optional
 - Modify any field-specific logic
+
+> **Important:** When changing knowledge item types (adding/removing/renaming), also update:
+> - `AddKnowledgeItemDialog.tsx` - Update `KNOWLEDGE_TYPES` array with new types
+> - `VideoTeachingView.tsx` - Update `TYPE_ICONS` and `TYPE_COLORS` mappings
 
 ### 6. Admin-Panel: Hooks (if needed)
 

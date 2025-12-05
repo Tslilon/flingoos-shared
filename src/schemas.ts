@@ -24,7 +24,7 @@ export const BridgeCommandResponseSchema = z.object({
   session_id: z.string().optional(),
   collectors: z.array(z.string()).optional(),
   timeout_seconds: z.number().optional(),
-  data: z.record(z.any()).optional(),
+  data: z.record(z.string(), z.any()).optional(),
   error: z.string().optional()
 });
 
@@ -112,8 +112,8 @@ export const SessionInternalStateSchema = z.object({
   error_message: z.string().optional(),
   
   // Legacy fields (keep for backward compatibility)
-  bridge_response: z.record(z.any()).optional(),
-  bridge_stop_response: z.record(z.any()).optional(),
+  bridge_response: z.record(z.string(), z.any()).optional(),
+  bridge_stop_response: z.record(z.string(), z.any()).optional(),
   workflow_id: z.string().optional()
 });
 
@@ -145,8 +145,8 @@ export const ForgeManifestSchema = z.object({
   version: z.string(),
   processing_id: z.string(),
   trigger_hash: z.string(),
-  session: z.record(z.any()),
-  options: z.record(z.any()),
+  session: z.record(z.string(), z.any()),
+  options: z.record(z.string(), z.any()),
   status: z.enum(PROCESSING_STATUSES),
   created_at: z.string(),
   completed_at: z.string().optional(),
@@ -310,7 +310,7 @@ export const PresenceStatusResponseSchema = z.object({
 // Session Schemas (Phase 14)
 export const SessionStartRequestSchema = z.object({
   presence_ticket: OpaqueTokenSchema,
-  session_options: z.record(z.any()).optional()
+  session_options: z.record(z.string(), z.any()).optional()
 }).describe('Request to POST /session/start with presence ticket');
 
 // Canonical Error Envelope (Phase 14) - CLOSED enum, fully documented
@@ -332,7 +332,7 @@ export const ErrorEnvelopeSchema = z.object({
   ]),
   http: z.number().int().min(400).max(599),
   message: z.string().min(1),
-  details: z.record(z.any()).optional() // Context: retry_after, device_id, ttl_seconds, etc.
+  details: z.record(z.string(), z.any()).optional() // Context: retry_after, device_id, ttl_seconds, etc.
 }).describe('Canonical error response envelope - CLOSED enum, no extensions allowed');
 
 // ============================================================================

@@ -22,6 +22,7 @@ export type ConfidenceLevel = z.infer<typeof ConfidenceLevelSchema>;
 export const NodeTypeSchema = z.enum(['step', 'decision']);
 export type NodeType = z.infer<typeof NodeTypeSchema>;
 
+// @deprecated - no longer used in new workflows
 export const ComplexitySchema = z.enum(['Simple', 'Moderate', 'Complex']);
 export type Complexity = z.infer<typeof ComplexitySchema>;
 
@@ -31,14 +32,20 @@ export type KnowledgeLevel = z.infer<typeof KnowledgeLevelSchema>;
 export const SessionTypeSchema = z.enum(['conceptual_explanation', 'procedural_demo', 'troubleshooting', 'overview']);
 export type SessionType = z.infer<typeof SessionTypeSchema>;
 
-export const KnowledgeItemTypeSchema = z.enum(['concept', 'procedure', 'best_practice', 'constraint', 'example']);
+export const KnowledgeItemTypeSchema = z.enum(['concept', 'procedure', 'best_practice', 'constraint', 'condition', 'example', 'identity', 'pointer']);
 export type KnowledgeItemType = z.infer<typeof KnowledgeItemTypeSchema>;
 
-export const ImportanceSchema = z.enum(['critical', 'high', 'medium', 'low']);
+// New binary importance: critical or standard
+// Kept old values for backward compatibility with existing data
+export const ImportanceSchema = z.enum(['critical', 'standard', 'high', 'medium', 'low']);
 export type Importance = z.infer<typeof ImportanceSchema>;
 
 export const RelationshipTypeSchema = z.enum(['requires', 'related', 'contrasts', 'extends', 'example_of']);
 export type RelationshipType = z.infer<typeof RelationshipTypeSchema>;
+
+// Step types for workflow steps
+export const StepTypeSchema = z.enum(['do', 'check', 'hitl']);
+export type StepType = z.infer<typeof StepTypeSchema>;
 
 // ============================================================================
 // Flowchart Schema
@@ -76,7 +83,7 @@ export const FlowchartNodeSchema = z.object({
   tools: z.array(z.string()).nullish(),
   notes: z.string().nullish(),
   confidence: ConfidenceLevelSchema.nullish(),
-  data: z.record(z.unknown()).nullish()
+  data: z.record(z.string(), z.unknown()).nullish()
 });
 
 export const FlowchartEdgeSchema = z.object({
@@ -89,8 +96,8 @@ export const FlowchartEdgeSchema = z.object({
 
 export const FlowchartLayoutSchema = z.object({
   persisted: z.boolean().default(false),
-  positions: z.record(z.object({ x: z.number(), y: z.number() })).default({}),
-  hints: z.record(z.unknown()).optional()
+  positions: z.record(z.string(), z.object({ x: z.number(), y: z.number() })).default({}),
+  hints: z.record(z.string(), z.unknown()).optional()
 });
 
 export const EntityPathMappingSchema = z.object({
@@ -131,9 +138,15 @@ export type Flowchart = z.infer<typeof FlowchartSchema>;
 export const VideoTaskSummarySchema = z.object({
   name: z.string(),
   goal: z.string(),
-  tools_used: z.array(z.string()),
-  complexity: ComplexitySchema,
-  estimated_duration_minutes: z.number().optional()
+  // New field: applications (replaces tools_used)
+  applications: z.array(z.string()).optional(),
+  // @deprecated - kept for backward compatibility with old data
+  tools_used: z.array(z.string()).optional(),
+  // @deprecated - no longer generated
+  complexity: ComplexitySchema.optional(),
+  estimated_duration_minutes: z.number().optional(),
+  // New field: abstract paragraph
+  abstract: z.string().optional()
 });
 
 export const VideoTemporalPhaseSchema = z.object({
@@ -145,8 +158,11 @@ export const VideoTemporalPhaseSchema = z.object({
   name: z.string(),
   purpose: z.string(),
   key_actions: z.array(z.string()),
-  confidence: ConfidenceLevelSchema,
-  audio_summary: z.string().optional()
+  // @deprecated - kept optional for backward compatibility
+  confidence: ConfidenceLevelSchema.optional(),
+  audio_summary: z.string().optional(),
+  // New field: phase-level success criteria (only if explicitly mentioned)
+  success_criteria: z.array(z.string()).optional()
 });
 
 export const VideoWorkflowStepSchema = z.object({
@@ -157,9 +173,20 @@ export const VideoWorkflowStepSchema = z.object({
   visual_cues: z.string().optional(),
   audio_context: z.string().optional(),
   expected_result: z.string(),
-  confidence: ConfidenceLevelSchema
+  // @deprecated - kept optional for backward compatibility
+  confidence: ConfidenceLevelSchema.optional(),
+  // New field: step type (do/check/hitl)
+  step_type: StepTypeSchema.optional()
 });
 
+// New schema replacing quick_reference
+export const VideoWorkflowNotesSchema = z.object({
+  success_criteria: z.array(z.string()),
+  constraints: z.array(z.string()),
+  pointers: z.array(z.string())
+});
+
+// @deprecated - kept for backward compatibility with old data
 export const VideoQuickReferenceSchema = z.object({
   prerequisites: z.array(z.string()),
   key_commands: z.array(z.string()),
@@ -167,17 +194,28 @@ export const VideoQuickReferenceSchema = z.object({
   verification_steps: z.array(z.string())
 });
 
+// Schema version enum for workflow guide
+export const WorkflowSchemaVersionSchema = z.enum(['1.0', '2.0']);
+export type WorkflowSchemaVersion = z.infer<typeof WorkflowSchemaVersionSchema>;
+
 export const VideoWorkflowGuideContentSchema = z.object({
+  // Schema version for migration - defaults to "1.0" for old data
+  schema_version: WorkflowSchemaVersionSchema.optional().default('1.0'),
   task_summary: VideoTaskSummarySchema,
   temporal_phases: z.array(VideoTemporalPhaseSchema),
   step_by_step_guide: z.array(VideoWorkflowStepSchema),
-  quick_reference: VideoQuickReferenceSchema,
+  // New field: workflow_notes (replaces quick_reference)
+  workflow_notes: VideoWorkflowNotesSchema.optional(),
+  // @deprecated - kept optional for backward compatibility with old data
+  quick_reference: VideoQuickReferenceSchema.optional(),
+  // @deprecated - no longer generated
   guide_markdown: z.string().optional()
 });
 
 export type VideoTaskSummary = z.infer<typeof VideoTaskSummarySchema>;
 export type VideoTemporalPhase = z.infer<typeof VideoTemporalPhaseSchema>;
 export type VideoWorkflowStep = z.infer<typeof VideoWorkflowStepSchema>;
+export type VideoWorkflowNotes = z.infer<typeof VideoWorkflowNotesSchema>;
 export type VideoQuickReference = z.infer<typeof VideoQuickReferenceSchema>;
 export type VideoWorkflowGuideContent = z.infer<typeof VideoWorkflowGuideContentSchema>;
 
@@ -189,14 +227,16 @@ export type WorkflowGuideContent = VideoWorkflowGuideContent;
 // Knowledge Base Content Schema (video_knowledge_base_content.json)
 // ============================================================================
 
-// Importance level schema - supports both formats for flexibility
-export const KnowledgeImportanceSchema = z.enum(['High', 'Medium', 'Low', 'critical', 'high', 'medium', 'low']);
+// Binary importance: critical or standard (new)
+// Kept old values (High, Medium, Low, high, medium, low) for backward compatibility with existing data
+export const KnowledgeImportanceSchema = z.enum(['critical', 'standard', 'High', 'Medium', 'Low', 'high', 'medium', 'low']);
 export type KnowledgeImportance = z.infer<typeof KnowledgeImportanceSchema>;
 
 export const SessionSummarySchema = z.object({
   topic: z.string(),
   subtopics: z.array(z.string()),
-  knowledge_level: KnowledgeLevelSchema,
+  // knowledge_level is deprecated and optional for backward compatibility
+  knowledge_level: KnowledgeLevelSchema.optional(),
   session_type: SessionTypeSchema,
   estimated_duration_minutes: z.number().optional()
 });
@@ -208,7 +248,6 @@ export const KnowledgeItemSchema = z.object({
   title: z.string(),
   content: z.string(),
   importance: KnowledgeImportanceSchema,
-  confidence: ConfidenceLevelSchema.optional(),
   related_items: z.array(z.string()).optional(),
   visual_aids: z.string().optional(),
   audio_emphasis: z.string().optional(),
@@ -216,11 +255,9 @@ export const KnowledgeItemSchema = z.object({
 });
 
 export const ConceptRelationshipSchema = z.object({
-  // Support both formats: from/to and from_item_id/to_item_id
-  from: z.string().optional(),
-  to: z.string().optional(),
-  from_item_id: z.string().optional(),
-  to_item_id: z.string().optional(),
+  // Primary fields - item_id references
+  from: z.string(),
+  to: z.string(),
   relationship: RelationshipTypeSchema,
   description: z.string()
 });
@@ -229,8 +266,10 @@ export const KnowledgeBaseContentSchema = z.object({
   session_summary: SessionSummarySchema,
   knowledge_items: z.array(KnowledgeItemSchema),
   concept_relationships: z.array(ConceptRelationshipSchema).optional(),
-  key_takeaways: z.array(z.string()),
-  suggested_context_usage: z.array(z.string()).optional()
+  // abstract replaces key_takeaways - a single paragraph for executives
+  abstract: z.string().optional(),
+  // key_takeaways is deprecated but kept optional for backward compatibility with old data
+  key_takeaways: z.array(z.string()).optional()
 });
 
 export type SessionSummary = z.infer<typeof SessionSummarySchema>;
@@ -324,4 +363,3 @@ export const FlowchartDocumentSchema = FirestoreVideoDocumentSchema.extend({
 export type WorkflowGuideDocument = z.infer<typeof WorkflowGuideDocumentSchema>;
 export type KnowledgeBaseDocument = z.infer<typeof KnowledgeBaseDocumentSchema>;
 export type FlowchartDocument = z.infer<typeof FlowchartDocumentSchema>;
-
