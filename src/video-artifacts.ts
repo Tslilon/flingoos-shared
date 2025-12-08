@@ -32,7 +32,18 @@ export type KnowledgeLevel = z.infer<typeof KnowledgeLevelSchema>;
 export const SessionTypeSchema = z.enum(['conceptual_explanation', 'procedural_demo', 'troubleshooting', 'overview']);
 export type SessionType = z.infer<typeof SessionTypeSchema>;
 
-export const KnowledgeItemTypeSchema = z.enum(['concept', 'procedure', 'best_practice', 'constraint', 'condition', 'example', 'identity', 'pointer']);
+// New 6-type system (v2): fact, procedure, rule, pointer, example, identity
+// - 'fact' replaces 'concept' (more user-friendly terminology)
+// - 'rule' merges old 'constraint' + 'condition' (structural + correctness rules)
+// - 'pointer' merges old 'best_practice' + 'pointer' (advisory knowledge)
+// Old types kept for backward compatibility with existing data
+export const KnowledgeItemTypeSchema = z.enum([
+  // New types (v2)
+  'fact', 'procedure', 'rule', 'pointer', 'example', 'identity',
+  // Legacy types for backward compatibility
+  'concept',  // replaced by 'fact'
+  'best_practice', 'constraint', 'condition'
+]);
 export type KnowledgeItemType = z.infer<typeof KnowledgeItemTypeSchema>;
 
 // New binary importance: critical or standard
