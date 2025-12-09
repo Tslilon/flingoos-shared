@@ -55,7 +55,7 @@ export const RelationshipTypeSchema = z.enum(['requires', 'related', 'contrasts'
 export type RelationshipType = z.infer<typeof RelationshipTypeSchema>;
 
 // Step types for workflow steps
-export const StepTypeSchema = z.enum(['do', 'check', 'hitl']);
+export const StepTypeSchema = z.enum(['do', 'check', 'hitl', 'conditional']);
 export type StepType = z.infer<typeof StepTypeSchema>;
 
 // ============================================================================
@@ -186,7 +186,7 @@ export const VideoWorkflowStepSchema = z.object({
   expected_result: z.string(),
   // @deprecated - kept optional for backward compatibility
   confidence: ConfidenceLevelSchema.optional(),
-  // New field: step type (do/check/hitl)
+  // New field: step type (do/check/hitl/conditional)
   step_type: StepTypeSchema.optional()
 });
 
