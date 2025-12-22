@@ -106,3 +106,14 @@ export {
   AuthTokenResponseSchema,
   AuthClaimsSchema
 } from './schemas.js';
+
+// Video artifact types for favorites and usage tracking
+export type {
+  UserFavorite,
+  FirestoreVideoDocument
+} from './video-artifacts.js';
+
+export {
+  UserFavoriteSchema,
+  FirestoreVideoDocumentSchema
+} from './video-artifacts.js';

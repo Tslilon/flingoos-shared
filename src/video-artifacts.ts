@@ -347,7 +347,9 @@ export const FirestoreVideoDocumentSchema = z.object({
     sha256: z.string(),
     manifest_sha256: z.string(),
     upload_timestamp: z.string()
-  })
+  }),
+  // Usage tracking (optional, defaults to 0 for backward compatibility)
+  usage_count: z.number().optional().default(0)
 });
 
 export type FirestoreVideoDocument = z.infer<typeof FirestoreVideoDocumentSchema>;
@@ -374,3 +376,19 @@ export const FlowchartDocumentSchema = FirestoreVideoDocumentSchema.extend({
 export type WorkflowGuideDocument = z.infer<typeof WorkflowGuideDocumentSchema>;
 export type KnowledgeBaseDocument = z.infer<typeof KnowledgeBaseDocumentSchema>;
 export type FlowchartDocument = z.infer<typeof FlowchartDocumentSchema>;
+
+// ============================================================================
+// User Favorites
+// ============================================================================
+
+/**
+ * User favorite schema for storing starred workflows per user.
+ * Stored at: /users/{user_id}/favorites/{session_id}
+ */
+export const UserFavoriteSchema = z.object({
+  session_id: z.string(),
+  org_id: z.string(),
+  starred_at: z.string() // ISO timestamp
+});
+
+export type UserFavorite = z.infer<typeof UserFavoriteSchema>;
