@@ -19,7 +19,6 @@ class Status(Enum):
 
 class Type(Enum):
     workflow = 'workflow'
-    flowchart = 'flowchart'
     analysis = 'analysis'
 
 

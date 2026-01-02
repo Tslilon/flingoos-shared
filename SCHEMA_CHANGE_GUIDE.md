@@ -25,7 +25,6 @@ LLM Prompt (video-forge)
 |--------------|-------------|
 | Workflow Guide | `video_workflow_recording.md` |
 | Knowledge Base (Teaching) | `video_teaching_session.md` |
-| Flowchart | Generated from workflow guide |
 
 **What to change:**
 - Add/remove field from the prompt instructions
@@ -40,7 +39,6 @@ LLM Prompt (video-forge)
 |--------------|-------------|
 | Workflow Guide | `video_workflow_guide_content.json` |
 | Knowledge Base | `video_knowledge_base_content.json` |
-| Flowchart | `flowchart.json` |
 
 **What to change:**
 - Add/remove property from schema
@@ -49,16 +47,7 @@ LLM Prompt (video-forge)
 
 > Note: These JSON schemas are currently documentation-only. Video-forge aims to produce this shape but doesn't validate against it.
 
-### 3. Video-Forge: Pydantic Models (if used)
-
-**Location:** `flingoos-video-forge/src/flingoos_video_forge/flowchart/schema.py`
-
-For flowcharts specifically, update:
-- `FlowchartNode`, `FlowchartPhase`, etc.
-- Add/remove fields
-- Update validators
-
-### 4. Shared Types: Zod Schemas (Source of Truth for Frontend)
+### 3. Shared Types: Zod Schemas (Source of Truth for Frontend)
 
 **Location:** `flingoos-shared/src/video-artifacts.ts`
 
@@ -66,15 +55,14 @@ For flowcharts specifically, update:
 |--------------|-------------|
 | Workflow Guide | `VideoWorkflowGuideContentSchema` |
 | Knowledge Base | `KnowledgeBaseContentSchema` |
-| Flowchart | `FlowchartSchema` |
 
 **What to change:**
 
 ```typescript
 // Example: Make 'confidence' optional
-export const FlowchartPhaseSchema = z.object({
-  id: z.string(),
-  title: z.string(),
+export const VideoTemporalPhaseSchema = z.object({
+  phase_number: z.number(),
+  name: z.string(),
   // Changed from required to optional:
   confidence: ConfidenceLevelSchema.optional(),
   // ...
@@ -86,7 +74,7 @@ export const FlowchartPhaseSchema = z.object({
 cd flingoos-shared && npm run build
 ```
 
-### 5. Admin-Panel: UI Components
+### 4. Admin-Panel: UI Components
 
 **Location:** `flingoos-admin-panel/frontend/src/components/sessions/`
 
@@ -94,7 +82,6 @@ cd flingoos-shared && npm run build
 |--------------|-----------------|
 | Workflow Guide | `VideoWorkflowView.tsx`, `WorkflowPhasesDisplay.tsx` |
 | Knowledge Base | `VideoTeachingView.tsx`, `AddKnowledgeItemDialog.tsx` |
-| Flowchart | `WorkflowFlowchart.tsx`, `flowchart/CustomNode.tsx` |
 
 **What to change:**
 - Remove/add field rendering
@@ -105,7 +92,7 @@ cd flingoos-shared && npm run build
 > - `AddKnowledgeItemDialog.tsx` - Update `KNOWLEDGE_TYPES` array with new types
 > - `VideoTeachingView.tsx` - Update `TYPE_ICONS` and `TYPE_COLORS` mappings
 
-### 6. Admin-Panel: Hooks (if needed)
+### 5. Admin-Panel: Hooks (if needed)
 
 **Location:** `flingoos-admin-panel/frontend/src/hooks/`
 

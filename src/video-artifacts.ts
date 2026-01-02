@@ -2,7 +2,6 @@
  * Video Artifact Schemas
  * 
  * Zod schemas for video-forge output artifacts:
- * - Flowchart (workflow visualization)
  * - WorkflowGuideContent (step-by-step workflow guides)
  * - KnowledgeBaseContent (teaching session knowledge bases)
  * 
@@ -18,9 +17,6 @@ import { z } from 'zod';
 
 export const ConfidenceLevelSchema = z.enum(['High', 'Medium', 'Low']);
 export type ConfidenceLevel = z.infer<typeof ConfidenceLevelSchema>;
-
-export const NodeTypeSchema = z.enum(['step', 'decision']);
-export type NodeType = z.infer<typeof NodeTypeSchema>;
 
 // @deprecated - no longer used in new workflows
 export const ComplexitySchema = z.enum(['Simple', 'Moderate', 'Complex']);
@@ -57,89 +53,6 @@ export type RelationshipType = z.infer<typeof RelationshipTypeSchema>;
 // Step types for workflow steps
 export const StepTypeSchema = z.enum(['do', 'check', 'hitl', 'conditional']);
 export type StepType = z.infer<typeof StepTypeSchema>;
-
-// ============================================================================
-// Flowchart Schema
-// ============================================================================
-
-export const FlowchartMetadataSchema = z.object({
-  id: z.string(),
-  source_processing_id: z.string(),
-  generated_at: z.string(), // ISO-8601
-  llm_model: z.string(),
-  llm_generated: z.boolean().default(true),
-  prompt_version: z.string().default('1.0')
-});
-
-export const FlowchartPhaseSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string().nullish(),
-  confidence: ConfidenceLevelSchema.nullish(),
-  segments: z.array(z.number()).nullish(),
-  reasoning: z.string().nullish(),
-  color: z.string().default('blue')
-});
-
-export const FlowchartNodeSchema = z.object({
-  id: z.string(),
-  type: NodeTypeSchema,
-  title: z.string(),
-  label: z.string().nullish(),  // allows null, undefined, or string
-  instructions: z.union([z.string(), z.array(z.string())]).nullish(),
-  question: z.string().nullish(),
-  phase_id: z.string().nullish(),
-  expected_result: z.string().nullish(),
-  prerequisites: z.array(z.string()).nullish(),
-  tools: z.array(z.string()).nullish(),
-  notes: z.string().nullish(),
-  confidence: ConfidenceLevelSchema.nullish(),
-  data: z.record(z.string(), z.unknown()).nullish()
-});
-
-export const FlowchartEdgeSchema = z.object({
-  id: z.string(),
-  source: z.string(),
-  target: z.string(),
-  label: z.string().optional(),
-  condition: z.string().optional()
-});
-
-export const FlowchartLayoutSchema = z.object({
-  persisted: z.boolean().default(false),
-  positions: z.record(z.string(), z.object({ x: z.number(), y: z.number() })).default({}),
-  hints: z.record(z.string(), z.unknown()).optional()
-});
-
-export const EntityPathMappingSchema = z.object({
-  entity_id: z.string(),
-  path: z.string()
-});
-
-export const FlowchartProvenanceSchema = z.object({
-  entity_path_map: z.array(EntityPathMappingSchema).optional(),
-  warnings: z.array(z.string()).optional(),
-  error: z.string().optional()
-});
-
-export const FlowchartSchema = z.object({
-  schema_version: z.string().default('1.0'),
-  title: z.string(),
-  metadata: FlowchartMetadataSchema.optional(),
-  phases: z.array(FlowchartPhaseSchema).optional(),
-  nodes: z.array(FlowchartNodeSchema),
-  edges: z.array(FlowchartEdgeSchema),
-  layout: FlowchartLayoutSchema.optional(),
-  provenance: FlowchartProvenanceSchema.optional()
-});
-
-export type FlowchartMetadata = z.infer<typeof FlowchartMetadataSchema>;
-export type FlowchartPhase = z.infer<typeof FlowchartPhaseSchema>;
-export type FlowchartNode = z.infer<typeof FlowchartNodeSchema>;
-export type FlowchartEdge = z.infer<typeof FlowchartEdgeSchema>;
-export type FlowchartLayout = z.infer<typeof FlowchartLayoutSchema>;
-export type FlowchartProvenance = z.infer<typeof FlowchartProvenanceSchema>;
-export type Flowchart = z.infer<typeof FlowchartSchema>;
 
 // ============================================================================
 // Video Workflow Guide Content Schema (video_workflow_guide_content.json)
@@ -369,13 +282,8 @@ export const KnowledgeBaseDocumentSchema = FirestoreVideoDocumentSchema.extend({
   })
 });
 
-export const FlowchartDocumentSchema = FirestoreVideoDocumentSchema.extend({
-  content: FlowchartSchema
-});
-
 export type WorkflowGuideDocument = z.infer<typeof WorkflowGuideDocumentSchema>;
 export type KnowledgeBaseDocument = z.infer<typeof KnowledgeBaseDocumentSchema>;
-export type FlowchartDocument = z.infer<typeof FlowchartDocumentSchema>;
 
 // ============================================================================
 // User Favorites

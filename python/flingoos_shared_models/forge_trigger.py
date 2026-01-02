@@ -45,7 +45,6 @@ class Options(BaseModel):
     stages: List[Stage]
     media_processing: bool
     llm_enabled: bool
-    include_flowchart: bool
 
 
 class Visibility(Enum):

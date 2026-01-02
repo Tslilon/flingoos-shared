@@ -12,7 +12,6 @@ from pydantic import BaseModel, ConfigDict
 
 class Type(Enum):
     workflow = 'workflow'
-    flowchart = 'flowchart'
     analysis = 'analysis'
 
 

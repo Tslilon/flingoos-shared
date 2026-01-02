@@ -123,7 +123,7 @@ export const SessionInternalStateSchema = z.object({
 
 export const ForgeArtifactSchema = z.object({
   name: z.string(),
-  type: z.enum(['workflow', 'flowchart', 'analysis']),
+  type: z.enum(['workflow', 'analysis']),
   stage: z.string(),
   local_path: z.string().optional(),
   gcs_uri: z.string(),
@@ -197,8 +197,7 @@ export const TriggerSessionSchema = z.object({
 export const TriggerOptionsSchema = z.object({
   stages: z.array(z.enum(STAGES)),
   media_processing: z.boolean(),
-  llm_enabled: z.boolean(),
-  include_flowchart: z.boolean()
+  llm_enabled: z.boolean()
 });
 
 export const ForgeTriggerSchema = z.object({
