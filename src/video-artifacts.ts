@@ -190,7 +190,7 @@ export const SessionSummarySchema = z.object({
 });
 
 export const KnowledgeItemSchema = z.object({
-  item_id: z.string(),
+  item_id: z.string().optional(),  // Optional for backward compat - merge system mints IDs
   type: KnowledgeItemTypeSchema,
   timestamp: z.number(),
   title: z.string(),
