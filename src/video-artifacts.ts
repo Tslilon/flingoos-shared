@@ -125,8 +125,113 @@ export const VideoQuickReferenceSchema = z.object({
 });
 
 // Schema version enum for workflow guide
-export const WorkflowSchemaVersionSchema = z.enum(['1.0', '2.0']);
+export const WorkflowSchemaVersionSchema = z.enum(['1.0', '2.0', '3.0']);
 export type WorkflowSchemaVersion = z.infer<typeof WorkflowSchemaVersionSchema>;
+
+// ============================================================================
+// Output Language (v3: language output support)
+// ============================================================================
+
+/**
+ * Output language options for video processing.
+ * 
+ * STABILITY NOTICE: Enum values (the string codes) must remain stable forever.
+ * These values are stored in Firestore and used across services.
+ * If you need to update display names, modify LANGUAGE_DISPLAY_NAMES only.
+ * NEVER rename or remove enum values once deployed.
+ */
+export const OutputLanguageSchema = z.enum([
+  'auto',  // Default: detect from input and match
+  'en',    // English
+  'es',    // Spanish
+  'fr',    // French
+  'de',    // German
+  'pt',    // Portuguese
+  'zh',    // Chinese (Simplified)
+  'ja',    // Japanese
+  'ko',    // Korean
+  'ar',    // Arabic
+  'he',    // Hebrew
+  'ru',    // Russian
+  'it',    // Italian
+  'nl',    // Dutch
+  'pl',    // Polish
+  'tr',    // Turkish
+  'vi',    // Vietnamese
+  'th',    // Thai
+  'id',    // Indonesian
+  'hi'     // Hindi
+]);
+export type OutputLanguage = z.infer<typeof OutputLanguageSchema>;
+
+/**
+ * Language display names for UI.
+ * These can be updated freely without breaking stored data.
+ */
+export const LANGUAGE_DISPLAY_NAMES: Record<OutputLanguage, string> = {
+  auto: 'Auto-detect',
+  en: 'English',
+  es: 'Spanish (Espanol)',
+  fr: 'French (Francais)',
+  de: 'German (Deutsch)',
+  pt: 'Portuguese (Portugues)',
+  zh: 'Chinese (Simplified)',
+  ja: 'Japanese',
+  ko: 'Korean',
+  ar: 'Arabic',
+  he: 'Hebrew',
+  ru: 'Russian',
+  it: 'Italian (Italiano)',
+  nl: 'Dutch (Nederlands)',
+  pl: 'Polish (Polski)',
+  tr: 'Turkish (Turkce)',
+  vi: 'Vietnamese (Tieng Viet)',
+  th: 'Thai',
+  id: 'Indonesian (Bahasa Indonesia)',
+  hi: 'Hindi'
+};
+
+/**
+ * RTL (right-to-left) languages.
+ * Used to determine text direction for UI rendering.
+ */
+export const RTL_LANGUAGES = new Set(['ar', 'he']);
+
+/**
+ * Determine text direction based on language code.
+ * 
+ * @param language - ISO 639-1 language code (e.g., 'he', 'ar', 'en')
+ * @returns 'rtl' for RTL languages, 'auto' for unknown (let browser detect), 'ltr' otherwise
+ */
+export function getTextDirection(language: string | undefined | null): 'rtl' | 'ltr' | 'auto' {
+  // Unknown language - let browser auto-detect from content
+  if (!language || language === 'auto') return 'auto';
+  // RTL languages
+  if (RTL_LANGUAGES.has(language)) return 'rtl';
+  // Everything else is LTR
+  return 'ltr';
+}
+
+/**
+ * Get the effective language from metadata.
+ * Uses detected_language for auto mode, otherwise output_language.
+ * 
+ * @param metadata - Video artifact metadata object
+ * @returns The effective language code or undefined
+ */
+export function getEffectiveLanguage(metadata: { 
+  output_language?: string; 
+  detected_language?: string 
+} | undefined | null): string | undefined {
+  if (!metadata) return undefined;
+  
+  // If output_language is 'auto', use detected_language
+  if (metadata.output_language === 'auto') {
+    return metadata.detected_language;
+  }
+  
+  return metadata.output_language;
+}
 
 // ============================================================================
 // Augmentation History (v1 augmentation)

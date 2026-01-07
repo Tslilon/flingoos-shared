@@ -115,12 +115,18 @@ export {
 // Video artifact types for favorites and usage tracking
 export type {
   UserFavorite,
-  FirestoreVideoDocument
+  FirestoreVideoDocument,
+  OutputLanguage
 } from './video-artifacts.js';
 
 export {
   UserFavoriteSchema,
-  FirestoreVideoDocumentSchema
+  FirestoreVideoDocumentSchema,
+  OutputLanguageSchema,
+  LANGUAGE_DISPLAY_NAMES,
+  RTL_LANGUAGES,
+  getTextDirection,
+  getEffectiveLanguage
 } from './video-artifacts.js';
 
 // Project types for domain grouping
