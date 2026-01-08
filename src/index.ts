@@ -118,7 +118,7 @@ export type {
   FirestoreVideoDocument,
   VideoWorkflowGuideContent,
   KnowledgeBaseContent,
-  StageVMetadata
+  StageVMetadata,
   OutputLanguage
 } from './video-artifacts.js';
 
@@ -127,7 +127,7 @@ export {
   FirestoreVideoDocumentSchema,
   VideoWorkflowGuideContentSchema,
   KnowledgeBaseContentSchema,
-  StageVMetadataSchema
+  StageVMetadataSchema,
   OutputLanguageSchema,
   LANGUAGE_DISPLAY_NAMES,
   RTL_LANGUAGES,
