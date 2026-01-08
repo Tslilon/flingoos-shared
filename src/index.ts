@@ -116,12 +116,18 @@ export {
 export type {
   UserFavorite,
   FirestoreVideoDocument,
+  VideoWorkflowGuideContent,
+  KnowledgeBaseContent,
+  StageVMetadata
   OutputLanguage
 } from './video-artifacts.js';
 
 export {
   UserFavoriteSchema,
   FirestoreVideoDocumentSchema,
+  VideoWorkflowGuideContentSchema,
+  KnowledgeBaseContentSchema,
+  StageVMetadataSchema
   OutputLanguageSchema,
   LANGUAGE_DISPLAY_NAMES,
   RTL_LANGUAGES,
