@@ -119,6 +119,7 @@ export type {
   VideoWorkflowGuideContent,
   KnowledgeBaseContent,
   StageVMetadata
+  OutputLanguage
 } from './video-artifacts.js';
 
 export {
@@ -127,6 +128,11 @@ export {
   VideoWorkflowGuideContentSchema,
   KnowledgeBaseContentSchema,
   StageVMetadataSchema
+  OutputLanguageSchema,
+  LANGUAGE_DISPLAY_NAMES,
+  RTL_LANGUAGES,
+  getTextDirection,
+  getEffectiveLanguage
 } from './video-artifacts.js';
 
 // Project types for domain grouping
