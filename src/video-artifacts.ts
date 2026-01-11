@@ -55,6 +55,67 @@ export const StepTypeSchema = z.enum(['do', 'check', 'hitl', 'conditional']);
 export type StepType = z.infer<typeof StepTypeSchema>;
 
 // ============================================================================
+// Conditional Step Details (v3.0 - structured branching)
+// ============================================================================
+
+/**
+ * Expression language version for future-proofing condition parsing.
+ * - simple_expr_v1: Basic expression syntax with AND/OR/NOT, comparisons, string ops
+ */
+export const ConditionLanguageSchema = z.enum(['simple_expr_v1']);
+export type ConditionLanguage = z.infer<typeof ConditionLanguageSchema>;
+
+/**
+ * Target step navigation for branching conditionals.
+ * At least one of if_true or if_false must be present when this object exists.
+ */
+export const ConditionalTargetStepsSchema = z.object({
+  if_true: z.number().optional(),   // Go to step N if condition is true
+  if_false: z.number().optional(),  // Go to step N if condition is false
+}).refine(
+  (data) => data.if_true !== undefined || data.if_false !== undefined,
+  { message: 'target_steps must include at least one of if_true or if_false' }
+);
+export type ConditionalTargetSteps = z.infer<typeof ConditionalTargetStepsSchema>;
+
+/**
+ * Structured conditional details for branching steps.
+ * 
+ * Only populated when step_type is 'conditional'.
+ * Provides structured information for export to automation platforms.
+ * 
+ * Expression syntax (simple_expr_v1):
+ * - Operators: >, <, =, >=, <=, !=, CONTAINS, STARTS_WITH, ENDS_WITH, IS_EMPTY, IS_NOT_EMPTY
+ * - Logic: AND, OR, NOT (uppercase)
+ * - Variables: value, text, row_count, etc.
+ * - Strings: single quotes ('blue')
+ * - Parentheses for grouping: (value > 5 AND value < 20) OR value = 0
+ * 
+ * Example conditions:
+ * - value > 5 AND value < 20
+ * - text CONTAINS 'blue'
+ * - NOT IS_EMPTY(value)
+ * - status = 'pending' OR status = 'draft'
+ */
+export const ConditionalDetailsSchema = z.object({
+  // The condition to evaluate (normalized expression format)
+  condition: z.string().min(1).transform(s => s.trim()),
+  
+  // Action to perform if condition is TRUE (required)
+  true_action: z.string().min(1).transform(s => s.trim()),
+  
+  // Action to perform if condition is FALSE (optional - not all conditionals have else)
+  false_action: z.string().transform(s => s.trim()).optional(),
+  
+  // Optional step navigation for complex branching workflows
+  target_steps: ConditionalTargetStepsSchema.optional(),
+  
+  // Expression language version (default: simple_expr_v1)
+  condition_language: ConditionLanguageSchema.optional().default('simple_expr_v1'),
+});
+export type ConditionalDetails = z.infer<typeof ConditionalDetailsSchema>;
+
+// ============================================================================
 // Video Workflow Guide Content Schema (video_workflow_guide_content.json)
 // This is for VIDEO-FORGE outputs, not bridge workflows
 // ============================================================================
@@ -99,8 +160,14 @@ export const VideoWorkflowStepSchema = z.object({
   expected_result: z.string(),
   // @deprecated - kept optional for backward compatibility
   confidence: ConfidenceLevelSchema.optional(),
-  // New field: step type (do/check/hitl/conditional)
+  // Step type (do/check/hitl/conditional)
   step_type: StepTypeSchema.optional(),
+  
+  // Conditional details (v3.0) - only populated when step_type is 'conditional'
+  // Shared schema is permissive (optional). Forge output validator enforces:
+  // - conditional step_type REQUIRES condition_details
+  // - non-conditional step_type FORBIDS condition_details
+  condition_details: ConditionalDetailsSchema.optional(),
   
   // Provenance fields (v1 augmentation)
   item_id: z.string().optional(),                      // UUIDv7, minted at creation (optional for backward compat)
@@ -125,6 +192,9 @@ export const VideoQuickReferenceSchema = z.object({
 });
 
 // Schema version enum for workflow guide
+// - 1.0: Original schema
+// - 2.0: Added step_type, workflow_notes, applications
+// - 3.0: Added condition_details for structured conditionals
 export const WorkflowSchemaVersionSchema = z.enum(['1.0', '2.0', '3.0']);
 export type WorkflowSchemaVersion = z.infer<typeof WorkflowSchemaVersionSchema>;
 
