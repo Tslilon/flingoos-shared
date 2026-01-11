@@ -107,7 +107,8 @@ export const ConditionalDetailsSchema = z.object({
   true_action: z.string().transform(s => s.trim()).pipe(z.string().min(1, 'True action cannot be empty')),
   
   // Action to perform if condition is FALSE (optional - not all conditionals have else)
-  false_action: z.string().transform(s => s.trim()).optional(),
+  // If provided, must have content after trimming (consistent with required fields)
+  false_action: z.string().transform(s => s.trim()).pipe(z.string().min(1, 'False action cannot be empty if provided')).optional(),
   
   // Optional step navigation for complex branching workflows
   target_steps: ConditionalTargetStepsSchema.optional(),
