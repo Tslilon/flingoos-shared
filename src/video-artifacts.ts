@@ -28,14 +28,15 @@ export type KnowledgeLevel = z.infer<typeof KnowledgeLevelSchema>;
 export const SessionTypeSchema = z.enum(['conceptual_explanation', 'procedural_demo', 'troubleshooting', 'overview']);
 export type SessionType = z.infer<typeof SessionTypeSchema>;
 
-// New 6-type system (v2): fact, procedure, rule, pointer, example, identity
+// New 7-type system (v2): fact, procedure, rule, pointer, example, identity, gap
 // - 'fact' replaces 'concept' (more user-friendly terminology)
 // - 'rule' merges old 'constraint' + 'condition' (structural + correctness rules)
 // - 'pointer' merges old 'best_practice' + 'pointer' (advisory knowledge)
+// - 'gap' represents explicitly acknowledged unknowns requiring investigation or clarification
 // Old types kept for backward compatibility with existing data
 export const KnowledgeItemTypeSchema = z.enum([
   // New types (v2)
-  'fact', 'procedure', 'rule', 'pointer', 'example', 'identity',
+  'fact', 'procedure', 'rule', 'pointer', 'example', 'identity', 'gap',
   // Legacy types for backward compatibility
   'concept',  // replaced by 'fact'
   'best_practice', 'constraint', 'condition'
