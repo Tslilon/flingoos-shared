@@ -14,6 +14,9 @@ export * from './stage-messages.js';
 export * from './video-artifacts.js';
 export * from './project.js';
 
+// Usage logging module (explicit namespace to avoid conflicts)
+export * as UsageLogging from './usage-logging/index.js';
+
 // Named exports for specific use cases
 export {
   // Constants
