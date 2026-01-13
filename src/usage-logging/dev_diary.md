@@ -28,6 +28,7 @@ This module provides a centralized usage event logging system for all Flingoos s
 
 - **Admin Panel** (web application)
 - **MCP Server** (AI tool invocations)
+- **Video Forge** (Python video processing service)
 - **Future services** (Ambient, etc.)
 
 ### Key Features
@@ -122,19 +123,19 @@ flingoos-shared/src/usage-logging/
 ### types.ts
 
 Defines:
-- `UsageAction`, `AdminPanelAction`, `McpAction` - Action type unions
+- `UsageAction`, `AdminPanelAction`, `McpAction`, `VideoForgeAction` - Action type unions
 - `RecordingSource`, `OutputType`, `ExportType` - Property enums
 - `UsageEvent`, `UsageLogOptions`, `McpLogOptions` - Event structures
-- `UsageTimeseriesDataPoint` - Chart data structure
+- `UsageTimeseriesDataPoint` - Chart data structure (includes video_forge fields)
 - `FirestoreOperations` - Firestore adapter interface
 
 ### constants.ts
 
 Exports:
-- `ADMIN_PANEL_ACTIONS`, `MCP_ACTIONS`, `ALL_ACTIONS` - Action arrays
-- `isValidAction()`, `isAdminPanelAction()`, `isMcpAction()` - Validators
-- `MAIN_METRICS`, `SECONDARY_METRICS`, `MCP_METRICS` - Chart configs
-- `ALL_COUNTER_FIELDS` - List of all counter field names
+- `ADMIN_PANEL_ACTIONS`, `MCP_ACTIONS`, `VIDEO_FORGE_ACTIONS`, `ALL_ACTIONS` - Action arrays
+- `isValidAction()`, `isAdminPanelAction()`, `isMcpAction()`, `isVideoForgeAction()` - Validators
+- `MAIN_METRICS`, `SECONDARY_METRICS`, `MCP_METRICS`, `VIDEO_FORGE_METRICS` - Chart configs
+- `ALL_COUNTER_FIELDS` - List of all counter field names (includes video_forge fields)
 - `USAGE_PATHS` - Firestore collection/document paths
 - `CHART_COLORS` - Consistent color palette
 
@@ -167,12 +168,29 @@ Provides:
 - Updated flingoos-mcp `usage-logger.ts` to wrap shared library
 - Maintained backward compatibility for all imports
 
-### Phase 3: Documentation & Testing (Current)
+### Phase 3: Documentation & Testing
 
 - Created comprehensive test suite
 - Added dev_diary.md (this file)
 - Added create_new_ticket_instructor.md
 - Local deployment testing
+
+### Phase 4: Video Forge Integration (January 13, 2026)
+
+- Added `VideoForgeAction` type: `video_forge_analysis`, `video_forge_augmentation`
+- Added `video-forge` service identifier
+- Added `VIDEO_FORGE_ACTIONS` array and `isVideoForgeAction()` validator
+- Added `VIDEO_FORGE_METRICS` configuration for charts
+- Added video_forge counter fields: `video_forge_input_tokens`, `video_forge_output_tokens`, `video_forge_cost_usd`
+- Updated admin-panel timeseries API to merge data from legacy paths
+- Added "Video Forge Cost" summary card to dashboard showing:
+  - Total cost in USD
+  - Average cost per active user
+
+**Note**: Video Forge is a Python service that logs directly to Firestore (not via this TypeScript library). The shared library provides:
+- Type definitions for documentation/consistency
+- Counter field names in `ALL_COUNTER_FIELDS`
+- Metric configurations for dashboard display
 
 ---
 
@@ -310,6 +328,7 @@ Manual verification:
 | 2026-01-13 | 0.1.0 | Initial implementation |
 | 2026-01-13 | 0.1.1 | Added README documentation |
 | 2026-01-13 | 0.1.2 | Added tests, dev_diary, instructor guide |
+| 2026-01-13 | 0.2.0 | Added Video Forge integration (types, constants, dashboard card) |
 
 ---
 
