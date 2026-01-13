@@ -9,6 +9,7 @@ import type {
   UsageAction, 
   AdminPanelAction, 
   McpAction,
+  VideoForgeAction,
   UsageService 
 } from './types.js';
 
@@ -39,11 +40,20 @@ export const MCP_ACTIONS: readonly McpAction[] = [
 ] as const;
 
 /**
+ * Valid Video Forge actions
+ */
+export const VIDEO_FORGE_ACTIONS: readonly VideoForgeAction[] = [
+  'video_forge_analysis',
+  'video_forge_augmentation',
+] as const;
+
+/**
  * All valid actions (combined)
  */
 export const ALL_ACTIONS: readonly UsageAction[] = [
   ...ADMIN_PANEL_ACTIONS,
   ...MCP_ACTIONS,
+  ...VIDEO_FORGE_ACTIONS,
 ] as const;
 
 /**
@@ -77,6 +87,7 @@ export const USAGE_SERVICES: readonly UsageService[] = [
   'flingoos-mcp',
   'flingoos-mcp-tools',
   'flingoos-ambient',
+  'video-forge',
 ] as const;
 
 // ==================== Firestore Paths ====================
@@ -219,6 +230,15 @@ export const ALL_COUNTER_FIELDS = [
   'mcp_context_search',
   'mcp_context_modify',
   'mcp_total',
+  
+  // Video Forge
+  'video_forge_analysis_count',
+  'video_forge_augmentation_count',
+  'video_forge_total_count',
+  'video_forge_input_tokens',
+  'video_forge_output_tokens',
+  'video_forge_total_tokens',
+  'video_forge_cost_usd',
 ] as const;
 
 // ==================== Type Exports ====================

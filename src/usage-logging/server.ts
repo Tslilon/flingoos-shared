@@ -168,6 +168,37 @@ export function getCounterUpdates(
       updates.mcp_context_modify = increment(1);
       updates.mcp_total = increment(1);
       break;
+    
+    // ==================== Video Forge Actions ====================
+    case 'video_forge_analysis':
+    case 'video_forge_augmentation':
+      // Track counts
+      if (action === 'video_forge_analysis') {
+        updates.video_forge_analysis_count = increment(1);
+      } else {
+        updates.video_forge_augmentation_count = increment(1);
+      }
+      updates.video_forge_total_count = increment(1);
+      
+      // Track tokens and cost
+      const inputTokens = properties?.input_tokens as number | undefined;
+      const outputTokens = properties?.output_tokens as number | undefined;
+      const totalTokens = properties?.total_tokens as number | undefined;
+      const costUsd = properties?.cost_usd as number | undefined;
+      
+      if (typeof inputTokens === 'number' && inputTokens > 0) {
+        updates.video_forge_input_tokens = increment(inputTokens);
+      }
+      if (typeof outputTokens === 'number' && outputTokens > 0) {
+        updates.video_forge_output_tokens = increment(outputTokens);
+      }
+      if (typeof totalTokens === 'number' && totalTokens > 0) {
+        updates.video_forge_total_tokens = increment(totalTokens);
+      }
+      if (typeof costUsd === 'number' && costUsd > 0) {
+        updates.video_forge_cost_usd = increment(costUsd);
+      }
+      break;
   }
   
   return updates;

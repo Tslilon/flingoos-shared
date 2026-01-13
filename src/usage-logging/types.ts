@@ -26,7 +26,8 @@ export type UsageService =
   | 'admin-panel'           // Flingoos Admin Panel (web)
   | 'flingoos-mcp'          // MCP Server
   | 'flingoos-mcp-tools'    // MCP Tools
-  | 'flingoos-ambient';     // Ambient Service
+  | 'flingoos-ambient'      // Ambient Service
+  | 'video-forge';          // Video Forge Service
 
 // ==================== Admin Panel Actions ====================
 
@@ -54,12 +55,21 @@ export type McpAction =
   | 'mcp_context_search'  // Semantic search across contexts
   | 'mcp_context_modify'; // Modifies workflow steps/phases
 
+// ==================== Video Forge Actions ====================
+
+/**
+ * Video Forge action types
+ */
+export type VideoForgeAction = 
+  | 'video_forge_analysis'      // Video analysis (standard mode)
+  | 'video_forge_augmentation'; // Video augmentation (additive mode)
+
 // ==================== Combined Actions ====================
 
 /**
  * All supported action types across all services
  */
-export type UsageAction = AdminPanelAction | McpAction;
+export type UsageAction = AdminPanelAction | McpAction | VideoForgeAction;
 
 // ==================== Property Types ====================
 
@@ -156,6 +166,23 @@ export interface McpContextModifyProperties extends BaseEventProperties {
   target_type?: string;
   auto_confirm?: boolean;
   modification_success?: boolean;
+}
+
+/**
+ * Properties for Video Forge events
+ */
+export interface VideoForgeProperties extends BaseEventProperties {
+  session_id?: string;
+  model?: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
+  cost_usd?: number;
+  video_duration_seconds?: number;
+  video_mode?: string;  // "inline" or "files_api"
+  video_fps?: number;
+  input_type?: string;  // "workflow_recording" or "teaching_session"
+  is_augmentation?: boolean;
 }
 
 /**
