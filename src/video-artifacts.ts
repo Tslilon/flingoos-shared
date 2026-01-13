@@ -52,7 +52,7 @@ export const RelationshipTypeSchema = z.enum(['requires', 'related', 'contrasts'
 export type RelationshipType = z.infer<typeof RelationshipTypeSchema>;
 
 // Step types for workflow steps
-export const StepTypeSchema = z.enum(['do', 'check', 'hitl', 'conditional']);
+export const StepTypeSchema = z.enum(['do', 'check', 'hitl', 'conditional', 'gap']);
 export type StepType = z.infer<typeof StepTypeSchema>;
 
 // ============================================================================
