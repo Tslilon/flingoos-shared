@@ -168,6 +168,27 @@ export function getCounterUpdates(
       updates.mcp_context_modify = increment(1);
       updates.mcp_total = increment(1);
       break;
+    
+    // ==================== Video Forge Actions ====================
+    // Note: Video Forge logs from Python with actual token/cost values.
+    // These cases handle logging via the shared library if needed.
+    case 'video_forge_analysis':
+    case 'video_forge_augmentation':
+      // Extract token counts and cost from properties
+      const inputTokens = properties?.input_tokens as number | undefined;
+      const outputTokens = properties?.output_tokens as number | undefined;
+      const costUsd = properties?.cost_usd as number | undefined;
+      
+      if (typeof inputTokens === 'number' && inputTokens > 0) {
+        updates.video_forge_input_tokens = increment(inputTokens);
+      }
+      if (typeof outputTokens === 'number' && outputTokens > 0) {
+        updates.video_forge_output_tokens = increment(outputTokens);
+      }
+      if (typeof costUsd === 'number' && costUsd > 0) {
+        updates.video_forge_cost_usd = increment(costUsd);
+      }
+      break;
   }
   
   return updates;
