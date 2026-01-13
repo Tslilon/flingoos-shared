@@ -26,7 +26,8 @@ export type UsageService =
   | 'admin-panel'           // Flingoos Admin Panel (web)
   | 'flingoos-mcp'          // MCP Server
   | 'flingoos-mcp-tools'    // MCP Tools
-  | 'flingoos-ambient';     // Ambient Service
+  | 'flingoos-ambient'      // Ambient Service
+  | 'video-forge';          // Video Forge (Python)
 
 // ==================== Admin Panel Actions ====================
 
@@ -54,12 +55,22 @@ export type McpAction =
   | 'mcp_context_search'  // Semantic search across contexts
   | 'mcp_context_modify'; // Modifies workflow steps/phases
 
+// ==================== Video Forge Actions ====================
+
+/**
+ * Video Forge action types (logged by Python video-forge service)
+ * These are logged directly to Firestore by the Python service
+ */
+export type VideoForgeAction = 
+  | 'video_forge_analysis'     // Video analysis processing
+  | 'video_forge_augmentation'; // Video augmentation processing
+
 // ==================== Combined Actions ====================
 
 /**
  * All supported action types across all services
  */
-export type UsageAction = AdminPanelAction | McpAction;
+export type UsageAction = AdminPanelAction | McpAction | VideoForgeAction;
 
 // ==================== Property Types ====================
 
@@ -262,6 +273,11 @@ export interface UsageTimeseriesDataPoint {
   mcp_context_search: number;
   mcp_context_modify: number;
   mcp_total: number;
+  
+  // Video Forge metrics (logged by Python video-forge service)
+  video_forge_input_tokens: number;
+  video_forge_output_tokens: number;
+  video_forge_cost_usd: number;
 }
 
 /**
