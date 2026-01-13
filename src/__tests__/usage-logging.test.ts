@@ -10,6 +10,7 @@ import {
   type UsageAction,
   type AdminPanelAction,
   type McpAction,
+  type VideoForgeAction,
   type UsageService,
   type RecordingSource,
   type OutputType,
@@ -20,11 +21,13 @@ import {
   // Constants
   ADMIN_PANEL_ACTIONS,
   MCP_ACTIONS,
+  VIDEO_FORGE_ACTIONS,
   ALL_ACTIONS,
   USAGE_SERVICES,
   isValidAction,
   isAdminPanelAction,
   isMcpAction,
+  isVideoForgeAction,
   
   // Metric configs
   MAIN_METRICS,
@@ -68,12 +71,23 @@ describe('Usage Logging Module', () => {
       expect(MCP_ACTIONS.length).toBe(4);
     });
     
+    it('should have all Video Forge actions', () => {
+      expect(VIDEO_FORGE_ACTIONS).toContain('video_forge_analysis');
+      expect(VIDEO_FORGE_ACTIONS).toContain('video_forge_augmentation');
+      expect(VIDEO_FORGE_ACTIONS.length).toBe(2);
+    });
+    
     it('should combine all actions correctly', () => {
-      expect(ALL_ACTIONS.length).toBe(ADMIN_PANEL_ACTIONS.length + MCP_ACTIONS.length);
+      expect(ALL_ACTIONS.length).toBe(
+        ADMIN_PANEL_ACTIONS.length + MCP_ACTIONS.length + VIDEO_FORGE_ACTIONS.length
+      );
       ADMIN_PANEL_ACTIONS.forEach(action => {
         expect(ALL_ACTIONS).toContain(action);
       });
       MCP_ACTIONS.forEach(action => {
+        expect(ALL_ACTIONS).toContain(action);
+      });
+      VIDEO_FORGE_ACTIONS.forEach(action => {
         expect(ALL_ACTIONS).toContain(action);
       });
     });
@@ -97,6 +111,15 @@ describe('Usage Logging Module', () => {
     });
     
     it('isMcpAction should correctly identify MCP actions', () => {
+      expect(isMcpAction('mcp_context_list')).toBe(true);
+      expect(isMcpAction('session')).toBe(false);
+      expect(isMcpAction('video_forge_analysis')).toBe(false);
+    });
+    
+    it('isVideoForgeAction should correctly identify Video Forge actions', () => {
+      expect(isVideoForgeAction('video_forge_analysis')).toBe(true);
+      expect(isVideoForgeAction('video_forge_augmentation')).toBe(true);
+      expect(isVideoForgeAction('session')).toBe(false);
       expect(isMcpAction('mcp_context_list')).toBe(true);
       expect(isMcpAction('mcp_context_modify')).toBe(true);
       expect(isMcpAction('session')).toBe(false);

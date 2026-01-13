@@ -9,6 +9,7 @@ import type {
   UsageAction, 
   AdminPanelAction, 
   McpAction,
+  VideoForgeAction,
   UsageService 
 } from './types.js';
 
@@ -39,11 +40,20 @@ export const MCP_ACTIONS: readonly McpAction[] = [
 ] as const;
 
 /**
+ * Valid Video Forge actions (logged by Python video-forge service)
+ */
+export const VIDEO_FORGE_ACTIONS: readonly VideoForgeAction[] = [
+  'video_forge_analysis',
+  'video_forge_augmentation',
+] as const;
+
+/**
  * All valid actions (combined)
  */
 export const ALL_ACTIONS: readonly UsageAction[] = [
   ...ADMIN_PANEL_ACTIONS,
   ...MCP_ACTIONS,
+  ...VIDEO_FORGE_ACTIONS,
 ] as const;
 
 /**
@@ -67,6 +77,13 @@ export function isMcpAction(action: string): action is McpAction {
   return MCP_ACTIONS.includes(action as McpAction);
 }
 
+/**
+ * Check if an action is a Video Forge action
+ */
+export function isVideoForgeAction(action: string): action is VideoForgeAction {
+  return VIDEO_FORGE_ACTIONS.includes(action as VideoForgeAction);
+}
+
 // ==================== Service Constants ====================
 
 /**
@@ -77,6 +94,7 @@ export const USAGE_SERVICES: readonly UsageService[] = [
   'flingoos-mcp',
   'flingoos-mcp-tools',
   'flingoos-ambient',
+  'video-forge',
 ] as const;
 
 // ==================== Firestore Paths ====================
@@ -187,6 +205,15 @@ export const MCP_METRICS = {
 } as const;
 
 /**
+ * Video Forge metrics configuration
+ */
+export const VIDEO_FORGE_METRICS = {
+  video_forge_input_tokens: { label: 'Input Tokens', color: CHART_COLORS.yellow },
+  video_forge_output_tokens: { label: 'Output Tokens', color: CHART_COLORS.green },
+  video_forge_cost_usd: { label: 'Cost ($)', color: CHART_COLORS.orange },
+} as const;
+
+/**
  * All counter field names that can appear in timeseries documents
  */
 export const ALL_COUNTER_FIELDS = [
@@ -219,6 +246,11 @@ export const ALL_COUNTER_FIELDS = [
   'mcp_context_search',
   'mcp_context_modify',
   'mcp_total',
+  
+  // Video Forge
+  'video_forge_input_tokens',
+  'video_forge_output_tokens',
+  'video_forge_cost_usd',
 ] as const;
 
 // ==================== Type Exports ====================
@@ -226,4 +258,5 @@ export const ALL_COUNTER_FIELDS = [
 export type MainMetricKey = keyof typeof MAIN_METRICS;
 export type SecondaryMetricKey = keyof typeof SECONDARY_METRICS;
 export type McpMetricKey = keyof typeof MCP_METRICS;
+export type VideoForgeMetricKey = keyof typeof VIDEO_FORGE_METRICS;
 export type CounterFieldKey = typeof ALL_COUNTER_FIELDS[number];
