@@ -274,6 +274,7 @@ export async function logUsageEvent(
     component: options.component || null,
     properties: Object.keys(cleanProperties || {}).length > 0 ? cleanProperties : null,
     period_id: periodId,
+    session_id: options.sessionId || null,
   };
   
   await firestore.addDocument('usage/events/data', eventData);

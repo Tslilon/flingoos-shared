@@ -193,6 +193,7 @@ export interface UsageEvent {
   period_id: string;
   properties?: Record<string, unknown> | null;
   service: UsageService;
+  session_id?: string | null;
   timestamp: unknown;  // FieldValue.serverTimestamp() or string
   user_email: string;
   user_id: string;
@@ -207,6 +208,7 @@ export interface UsageEventRequest {
   action: UsageAction;
   component?: string;
   properties?: Record<string, unknown>;
+  session_id?: string;
 }
 
 /**
@@ -233,6 +235,7 @@ export interface UsageLogOptions {
   service: UsageService;
   component?: string;
   properties?: Record<string, unknown>;
+  sessionId?: string;
 }
 
 /**
