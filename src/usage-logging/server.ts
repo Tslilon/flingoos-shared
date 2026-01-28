@@ -132,6 +132,10 @@ export function getCounterUpdates(
       updates.publishes = increment(1);
       break;
       
+    case 'unpublish':
+      updates.unpublishes = increment(1);
+      break;
+      
     case 'export':
       // Check if this is an n8n export (AI-powered, resource-intensive)
       const exportType = properties?.export_type as string | undefined;
@@ -172,6 +176,11 @@ export function getCounterUpdates(
       
     case 'mcp_context_modify':
       updates.mcp_context_modify = increment(1);
+      updates.mcp_total = increment(1);
+      break;
+      
+    case 'mcp_context_generate':
+      updates.mcp_context_generate = increment(1);
       updates.mcp_total = increment(1);
       break;
     
@@ -431,6 +440,37 @@ export function createLogContextModify(firestore: FirestoreOperations) {
         target_type: targetType,
         auto_confirm: autoConfirm,
         modification_success: wasSuccessful,
+      },
+    }, firestore).catch(() => {}); // Fire and forget
+  };
+}
+
+/**
+ * Log context-generate MCP tool usage
+ */
+export function createLogContextGenerate(firestore: FirestoreOperations) {
+  return function logContextGenerate(
+    userId: string,
+    orgId: string,
+    sessionId: string,
+    outputType: 'workflow_recording' | 'teaching_session',
+    contentLength: number,
+    visibility?: string,
+    projectId?: string,
+    userEmail?: string
+  ): void {
+    logMcpUsage({
+      action: 'mcp_context_generate',
+      userId,
+      userEmail,
+      orgId,
+      component: 'context-generate',
+      properties: {
+        session_id: sessionId,
+        output_type: outputType,
+        content_length: contentLength,
+        visibility,
+        project_id: projectId,
       },
     }, firestore).catch(() => {}); // Fire and forget
   };

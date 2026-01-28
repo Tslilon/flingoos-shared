@@ -39,6 +39,7 @@ export type AdminPanelAction =
   | 'session_complete'    // Recording session completed (with duration)
   | 'workflow_edit'       // Edit/save a workflow
   | 'publish'             // Publish workflow
+  | 'unpublish'           // Unpublish workflow (change visibility from public to private)
   | 'export'              // Export workflow
   | 'chatbot_message'     // Send message to chatbot
   | 'enrich_click'        // Click enrich button
@@ -53,7 +54,8 @@ export type McpAction =
   | 'mcp_context_list'    // Lists available contexts (projects/sessions)
   | 'mcp_context_get'     // Gets a specific context by ID
   | 'mcp_context_search'  // Semantic search across contexts
-  | 'mcp_context_modify'; // Modifies workflow steps/phases
+  | 'mcp_context_modify' // Modifies workflow steps/phases
+  | 'mcp_context_generate'; // Generates new workflow/knowledge base from text
 
 // ==================== Video Forge Actions ====================
 
@@ -169,6 +171,17 @@ export interface McpContextModifyProperties extends BaseEventProperties {
 }
 
 /**
+ * Properties for MCP context-generate events
+ */
+export interface McpContextGenerateProperties extends BaseEventProperties {
+  session_id?: string;
+  output_type?: 'workflow_recording' | 'teaching_session';
+  content_length?: number;
+  visibility?: string;
+  project_id?: string;
+}
+
+/**
  * Standard Usage Event Structure
  * All events stored in Firestore conform to this format.
  */
@@ -258,6 +271,7 @@ export interface UsageTimeseriesDataPoint {
   
   // Outputs
   publishes: number;
+  unpublishes: number;
   exports: number;
   n8n_exports: number;  // AI-powered n8n exports (separate from regular exports)
   
@@ -273,6 +287,7 @@ export interface UsageTimeseriesDataPoint {
   mcp_context_get: number;
   mcp_context_search: number;
   mcp_context_modify: number;
+  mcp_context_generate: number;
   mcp_total: number;
   
   // Video Forge metrics (logged by Python video-forge service)

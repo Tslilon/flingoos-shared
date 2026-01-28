@@ -23,6 +23,7 @@ export const ADMIN_PANEL_ACTIONS: readonly AdminPanelAction[] = [
   'session_complete',
   'workflow_edit',
   'publish',
+  'unpublish',
   'export',
   'chatbot_message',
   'enrich_click',
@@ -37,6 +38,7 @@ export const MCP_ACTIONS: readonly McpAction[] = [
   'mcp_context_get',
   'mcp_context_search',
   'mcp_context_modify',
+  'mcp_context_generate',
 ] as const;
 
 /**
@@ -177,6 +179,7 @@ export const MAIN_METRICS = {
   sessions_completed: { label: 'Sessions Completed', color: CHART_COLORS.teal },  // Logged by video-forge
   sessions_failed: { label: 'Sessions Failed', color: CHART_COLORS.orange },       // Logged by video-forge
   publishes: { label: 'Publishes', color: CHART_COLORS.green },
+  unpublishes: { label: 'Unpublishes', color: CHART_COLORS.orange },
   exports: { label: 'Exports', color: CHART_COLORS.cyan },
   n8n_exports: { label: 'n8n Exports', color: CHART_COLORS.red },  // AI-powered n8n exports (resource-intensive)
   sessions_screen: { label: 'Screen Sessions', color: CHART_COLORS.purple },
@@ -204,6 +207,7 @@ export const MCP_METRICS = {
   mcp_context_get: { label: 'MCP Get', color: CHART_COLORS.purple },
   mcp_context_search: { label: 'MCP Search', color: CHART_COLORS.green },
   mcp_context_modify: { label: 'MCP Modify', color: CHART_COLORS.yellow },
+  mcp_context_generate: { label: 'MCP Generate', color: CHART_COLORS.orange },
   mcp_total: { label: 'MCP Total', color: CHART_COLORS.blue },
 } as const;
 
@@ -235,6 +239,7 @@ export const ALL_COUNTER_FIELDS = [
   
   // Outputs
   'publishes',
+  'unpublishes',
   'exports',
   'n8n_exports',  // AI-powered n8n exports (resource-intensive)
   
@@ -250,6 +255,7 @@ export const ALL_COUNTER_FIELDS = [
   'mcp_context_get',
   'mcp_context_search',
   'mcp_context_modify',
+  'mcp_context_generate',
   'mcp_total',
   
   // Video Forge
