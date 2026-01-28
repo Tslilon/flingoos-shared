@@ -12,6 +12,7 @@ export * from './schemas.js';
 export * from './validation.js';
 export * from './stage-messages.js';
 export * from './video-artifacts.js';
+export * from './session-translations.js';
 export * from './project.js';
 
 // Usage logging module (explicit namespace to avoid conflicts)
@@ -135,8 +136,27 @@ export {
   LANGUAGE_DISPLAY_NAMES,
   RTL_LANGUAGES,
   getTextDirection,
-  getEffectiveLanguage
+  getEffectiveLanguage,
+  getLanguageBaseTag
 } from './video-artifacts.js';
+
+export {
+  TranslationStatusSchema,
+  TranslationEntrySchema,
+  SessionTranslationsSchema,
+  FreshnessStatusSchema,
+  getCanonicalContent,
+  getResolvedContent
+} from './session-translations.js';
+
+export type {
+  TranslationStatus,
+  TranslationEntry,
+  SessionTranslations,
+  SessionContentDoc,
+  FreshnessStatus,
+  ResolvedContentResult
+} from './session-translations.js';
 
 // Project types for domain grouping
 export type {
