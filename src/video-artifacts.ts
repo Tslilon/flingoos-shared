@@ -218,6 +218,7 @@ export const OutputLanguageSchema = z.enum([
   'auto',  // Default: detect from input and match
   'en',    // English
   'es',    // Spanish
+  'he',    // Hebrew
   'fr',    // French
   'de',    // German
   'pt',    // Portuguese
@@ -225,7 +226,6 @@ export const OutputLanguageSchema = z.enum([
   'ja',    // Japanese
   'ko',    // Korean
   'ar',    // Arabic
-  'he',    // Hebrew
   'ru',    // Russian
   'it',    // Italian
   'nl',    // Dutch
@@ -247,13 +247,14 @@ export const LANGUAGE_DISPLAY_NAMES: Record<OutputLanguage, string> = {
   en: 'English',
   es: 'Spanish (Espanol)',
   fr: 'French (Francais)',
+  he: 'Hebrew (עברית)',
   de: 'German (Deutsch)',
   pt: 'Portuguese (Portugues)',
   zh: 'Chinese (Simplified)',
-  ja: 'Japanese',
+  hi: 'Hindi (हिंदी)',
+  ja: 'Japanese (日本語)',
   ko: 'Korean',
-  ar: 'Arabic',
-  he: 'Hebrew',
+  ar: 'Arabic (العربية)',
   ru: 'Russian',
   it: 'Italian (Italiano)',
   nl: 'Dutch (Nederlands)',
@@ -262,27 +263,36 @@ export const LANGUAGE_DISPLAY_NAMES: Record<OutputLanguage, string> = {
   vi: 'Vietnamese (Tieng Viet)',
   th: 'Thai',
   id: 'Indonesian (Bahasa Indonesia)',
-  hi: 'Hindi'
 };
 
 /**
  * RTL (right-to-left) languages.
- * Used to determine text direction for UI rendering.
+ * Used to determine text direction for UI rendering and exports.
+ * Base tags only (e.g. ar, he); languageBaseTag in code should match.
  */
-export const RTL_LANGUAGES = new Set(['ar', 'he']);
+export const RTL_LANGUAGES = new Set<string>(['ar', 'he', 'fa', 'ur', 'dv', 'ps', 'yi']);
+
+/**
+ * Base language tag from BCP-47 (e.g. 'he-IL' -> 'he', 'en' -> 'en').
+ * Used for RTL and language metadata lookups.
+ */
+export function getLanguageBaseTag(language: string | undefined | null): string | undefined {
+  if (!language || language === 'auto') return undefined;
+  const base = language.split('-')[0].toLowerCase();
+  return base || undefined;
+}
 
 /**
  * Determine text direction based on language code.
- * 
- * @param language - ISO 639-1 language code (e.g., 'he', 'ar', 'en')
+ * Uses base tag so that 'he-IL' and 'he' both resolve to RTL.
+ *
+ * @param language - BCP-47 language code (e.g., 'he', 'ar', 'en', 'he-IL')
  * @returns 'rtl' for RTL languages, 'auto' for unknown (let browser detect), 'ltr' otherwise
  */
 export function getTextDirection(language: string | undefined | null): 'rtl' | 'ltr' | 'auto' {
-  // Unknown language - let browser auto-detect from content
-  if (!language || language === 'auto') return 'auto';
-  // RTL languages
-  if (RTL_LANGUAGES.has(language)) return 'rtl';
-  // Everything else is LTR
+  const base = getLanguageBaseTag(language);
+  if (!base) return 'auto';
+  if (RTL_LANGUAGES.has(base)) return 'rtl';
   return 'ltr';
 }
 
