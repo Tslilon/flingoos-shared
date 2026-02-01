@@ -10,6 +10,7 @@ import type {
   AdminPanelAction, 
   McpAction,
   VideoForgeAction,
+  BillingAction,
   UsageService 
 } from './types.js';
 
@@ -50,12 +51,29 @@ export const VIDEO_FORGE_ACTIONS: readonly VideoForgeAction[] = [
 ] as const;
 
 /**
+ * Valid Billing actions (subscription and payment events)
+ */
+export const BILLING_ACTIONS: readonly BillingAction[] = [
+  'billing_page_viewed',
+  'billing_plan_selected',
+  'billing_checkout_started',
+  'billing_checkout_completed',
+  'billing_free_extension',
+  'subscription_created',
+  'subscription_updated',
+  'subscription_canceled',
+  'payment_succeeded',
+  'payment_failed',
+] as const;
+
+/**
  * All valid actions (combined)
  */
 export const ALL_ACTIONS: readonly UsageAction[] = [
   ...ADMIN_PANEL_ACTIONS,
   ...MCP_ACTIONS,
   ...VIDEO_FORGE_ACTIONS,
+  ...BILLING_ACTIONS,
 ] as const;
 
 /**
@@ -84,6 +102,13 @@ export function isMcpAction(action: string): action is McpAction {
  */
 export function isVideoForgeAction(action: string): action is VideoForgeAction {
   return VIDEO_FORGE_ACTIONS.includes(action as VideoForgeAction);
+}
+
+/**
+ * Check if an action is a Billing action
+ */
+export function isBillingAction(action: string): action is BillingAction {
+  return BILLING_ACTIONS.includes(action as BillingAction);
 }
 
 // ==================== Service Constants ====================
@@ -221,6 +246,21 @@ export const VIDEO_FORGE_METRICS = {
 } as const;
 
 /**
+ * Billing metrics configuration
+ */
+export const BILLING_METRICS = {
+  active_subscriptions_individual: { label: 'Individual Subscribers', color: CHART_COLORS.cyan },
+  active_subscriptions_business: { label: 'Business Subscribers', color: CHART_COLORS.purple },
+  new_subscriptions: { label: 'New Subscriptions', color: CHART_COLORS.green },
+  canceled_subscriptions: { label: 'Canceled Subscriptions', color: CHART_COLORS.red },
+  billing_page_views: { label: 'Billing Page Views', color: CHART_COLORS.blue },
+  checkout_started: { label: 'Checkouts Started', color: CHART_COLORS.yellow },
+  checkout_completed: { label: 'Checkouts Completed', color: CHART_COLORS.teal },
+  free_extensions_claimed: { label: 'Free Extensions', color: CHART_COLORS.orange },
+  revenue_usd: { label: 'Revenue ($)', color: CHART_COLORS.green },
+} as const;
+
+/**
  * All counter field names that can appear in timeseries documents
  */
 export const ALL_COUNTER_FIELDS = [
@@ -262,6 +302,17 @@ export const ALL_COUNTER_FIELDS = [
   'video_forge_input_tokens',
   'video_forge_output_tokens',
   'video_forge_cost_usd',
+  
+  // Billing
+  'active_subscriptions_individual',
+  'active_subscriptions_business',
+  'new_subscriptions',
+  'canceled_subscriptions',
+  'billing_page_views',
+  'checkout_started',
+  'checkout_completed',
+  'free_extensions_claimed',
+  'revenue_usd',
 ] as const;
 
 // ==================== Type Exports ====================
@@ -270,4 +321,5 @@ export type MainMetricKey = keyof typeof MAIN_METRICS;
 export type SecondaryMetricKey = keyof typeof SECONDARY_METRICS;
 export type McpMetricKey = keyof typeof MCP_METRICS;
 export type VideoForgeMetricKey = keyof typeof VIDEO_FORGE_METRICS;
+export type BillingMetricKey = keyof typeof BILLING_METRICS;
 export type CounterFieldKey = typeof ALL_COUNTER_FIELDS[number];

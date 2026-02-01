@@ -66,12 +66,29 @@ export type VideoForgeAction =
   | 'video_forge_analysis'     // Video analysis processing
   | 'video_forge_augmentation'; // Video augmentation processing
 
+// ==================== Billing Actions ====================
+
+/**
+ * Billing action types (subscription and payment events)
+ */
+export type BillingAction = 
+  | 'billing_page_viewed'       // User viewed billing/pricing page
+  | 'billing_plan_selected'     // User selected a plan
+  | 'billing_checkout_started'  // Paddle checkout opened
+  | 'billing_checkout_completed'// Paddle checkout completed (frontend confirmation)
+  | 'billing_free_extension'    // User claimed free extension
+  | 'subscription_created'      // Paddle webhook: subscription created
+  | 'subscription_updated'      // Paddle webhook: subscription updated
+  | 'subscription_canceled'     // Paddle webhook: subscription canceled
+  | 'payment_succeeded'         // Paddle webhook: payment successful
+  | 'payment_failed';           // Paddle webhook: payment failed
+
 // ==================== Combined Actions ====================
 
 /**
  * All supported action types across all services
  */
-export type UsageAction = AdminPanelAction | McpAction | VideoForgeAction;
+export type UsageAction = AdminPanelAction | McpAction | VideoForgeAction | BillingAction;
 
 // ==================== Property Types ====================
 
@@ -179,6 +196,21 @@ export interface McpContextGenerateProperties extends BaseEventProperties {
   content_length?: number;
   visibility?: string;
   project_id?: string;
+}
+
+/**
+ * Properties for billing events
+ */
+export interface BillingEventProperties extends BaseEventProperties {
+  plan_id?: 'free' | 'individual' | 'business';
+  billing_cycle?: 'monthly' | 'annual';
+  paddle_subscription_id?: string;
+  paddle_customer_id?: string;
+  paddle_transaction_id?: string;
+  amount_usd?: number;
+  seats?: number;
+  previous_plan?: string;
+  new_plan?: string;
 }
 
 /**
@@ -297,6 +329,17 @@ export interface UsageTimeseriesDataPoint {
   video_forge_input_tokens: number;
   video_forge_output_tokens: number;
   video_forge_cost_usd: number;
+  
+  // Billing metrics (logged by admin-panel billing page and webhooks)
+  billing_page_views: number;
+  checkout_started: number;
+  checkout_completed: number;
+  free_extensions_claimed: number;
+  new_subscriptions: number;
+  canceled_subscriptions: number;
+  active_subscriptions_individual: number;
+  active_subscriptions_business: number;
+  revenue_usd: number;
 }
 
 /**
