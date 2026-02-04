@@ -140,10 +140,11 @@ export const VideoTaskSummarySchema = z.object({
 
 export const VideoTemporalPhaseSchema = z.object({
   phase_number: z.number(),
+  // Optional for text-based workflows; required for video-based workflows
   timestamp_range: z.object({
     start: z.number(),
     end: z.number()
-  }),
+  }).optional(),
   name: z.string(),
   purpose: z.string(),
   key_actions: z.array(z.string()),
@@ -156,7 +157,12 @@ export const VideoTemporalPhaseSchema = z.object({
 
 export const VideoWorkflowStepSchema = z.object({
   step_number: z.number(),
-  timestamp: z.number(),
+  // Optional for text-based workflows; present for video-based workflows
+  timestamp: z.number().optional(),
+  // Explicit phase assignment (priority over timestamp-based matching)
+  // Used by text-based workflows and UI edits; video workflows compute from timestamp
+  // null means explicitly ungrouped (moved to "Additional Steps")
+  phase_number: z.number().nullable().optional(),
   title: z.string(),
   action: z.string(),
   visual_cues: z.string().optional(),
@@ -361,6 +367,47 @@ export const WorkflowGuideContentSchema = VideoWorkflowGuideContentSchema;
 export type WorkflowGuideContent = VideoWorkflowGuideContent;
 
 // ============================================================================
+// Phase Assignment Helper (hybrid: phase_number > timestamp matching)
+// ============================================================================
+
+/**
+ * Get the phase index for a step using hybrid assignment logic.
+ * Priority: explicit phase_number > timestamp-based matching > unassigned
+ * 
+ * @param step - The workflow step to find phase for
+ * @param phases - Array of temporal phases
+ * @returns Phase array index (0-based) or null if unassigned
+ */
+export function getStepPhaseIndex(
+  step: VideoWorkflowStep,
+  phases: VideoTemporalPhase[]
+): number | null {
+  // Check for explicit "ungrouped" assignment (phase_number === null)
+  if (step.phase_number === null) {
+    return null;
+  }
+  
+  // Priority 1: Explicit phase_number
+  if (step.phase_number !== undefined) {
+    const idx = phases.findIndex(p => p.phase_number === step.phase_number);
+    return idx >= 0 ? idx : null;
+  }
+  
+  // Priority 2: Timestamp-based matching (backward compat for video workflows)
+  // Ignore timestamp of 0 (00:00) - these are placeholder values from text-based generation
+  if (step.timestamp !== undefined && step.timestamp !== 0) {
+    for (let i = 0; i < phases.length; i++) {
+      const range = phases[i].timestamp_range;
+      if (range && step.timestamp >= range.start && step.timestamp <= range.end) {
+        return i;
+      }
+    }
+  }
+  
+  return null; // Unassigned
+}
+
+// ============================================================================
 // Knowledge Base Content Schema (video_knowledge_base_content.json)
 // ============================================================================
 
@@ -381,7 +428,8 @@ export const SessionSummarySchema = z.object({
 export const KnowledgeItemSchema = z.object({
   item_id: z.string().optional(),  // Optional for backward compat - merge system mints IDs
   type: KnowledgeItemTypeSchema,
-  timestamp: z.number(),
+  // Optional for text-based workflows; present for video-based workflows
+  timestamp: z.number().optional(),
   title: z.string(),
   content: z.string(),
   importance: KnowledgeImportanceSchema,
