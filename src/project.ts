@@ -31,6 +31,8 @@ export const CreateProjectSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be 100 characters or less'),
   description: z.string().max(500, 'Description must be 500 characters or less').optional(),
   visibility: ProjectVisibilitySchema.default('private'),
+  editors: z.array(z.string()).optional(),
+  viewers: z.array(z.string()).optional(),
 });
 export type CreateProject = z.infer<typeof CreateProjectSchema>;
 
@@ -42,6 +44,8 @@ export const UpdateProjectSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional().nullable(),
   visibility: ProjectVisibilitySchema.optional(),
+  editors: z.array(z.string()).optional(),
+  viewers: z.array(z.string()).optional(),
 });
 export type UpdateProject = z.infer<typeof UpdateProjectSchema>;
 
@@ -181,6 +185,8 @@ export const MCPProjectResponseSchema = z.object({
   workflow_count: z.number(),
   teaching_count: z.number(),
   sessions: z.array(ProjectSessionWithContentSchema),
+  editors: z.array(z.string()).optional(),
+  viewers: z.array(z.string()).optional(),
 });
 export type MCPProjectResponse = z.infer<typeof MCPProjectResponseSchema>;
 
