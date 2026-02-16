@@ -15,7 +15,8 @@ import type {
   McpLogOptions,
   RecordingSource,
   OutputType,
-  CounterUpdates 
+  CounterUpdates,
+  McpToolStatus,
 } from './types.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -349,18 +350,23 @@ export function createLogContextList(firestore: FirestoreOperations) {
     orgId: string,
     scope: string,
     resultsCount: number,
-    userEmail?: string
+    userEmail?: string,
+    durationSeconds?: number,
+    toolStatus?: McpToolStatus
   ): void {
+    const properties: Record<string, unknown> = {
+      scope,
+      results_count: resultsCount,
+    };
+    if (durationSeconds !== undefined) properties.duration_seconds = durationSeconds;
+    if (toolStatus !== undefined) properties.status = toolStatus;
     logMcpUsage({
       action: 'mcp_context_list',
       userId,
       userEmail,
       orgId,
       component: 'context-list',
-      properties: {
-        scope,
-        results_count: resultsCount,
-      },
+      properties,
     }, firestore).catch(() => {}); // Fire and forget
   };
 }
@@ -375,19 +381,24 @@ export function createLogContextGet(firestore: FirestoreOperations) {
     contextId: string,
     contextKind: 'project' | 'session',
     sessionType?: string,
-    userEmail?: string
+    userEmail?: string,
+    durationSeconds?: number,
+    toolStatus?: McpToolStatus
   ): void {
+    const properties: Record<string, unknown> = {
+      context_id: contextId,
+      context_kind: contextKind,
+      session_type: sessionType,
+    };
+    if (durationSeconds !== undefined) properties.duration_seconds = durationSeconds;
+    if (toolStatus !== undefined) properties.status = toolStatus;
     logMcpUsage({
       action: 'mcp_context_get',
       userId,
       userEmail,
       orgId,
       component: 'context-get',
-      properties: {
-        context_id: contextId,
-        context_kind: contextKind,
-        session_type: sessionType,
-      },
+      properties,
     }, firestore).catch(() => {}); // Fire and forget
   };
 }
@@ -400,19 +411,24 @@ export function createLogContextSearch(firestore: FirestoreOperations) {
     userId: string,
     orgId: string,
     resultsCount: number,
-    status: string,
-    userEmail?: string
+    searchStatus: string,
+    userEmail?: string,
+    durationSeconds?: number,
+    toolStatus?: McpToolStatus
   ): void {
+    const properties: Record<string, unknown> = {
+      results_count: resultsCount,
+      search_status: searchStatus,
+    };
+    if (durationSeconds !== undefined) properties.duration_seconds = durationSeconds;
+    if (toolStatus !== undefined) properties.status = toolStatus;
     logMcpUsage({
       action: 'mcp_context_search',
       userId,
       userEmail,
       orgId,
       component: 'context-search',
-      properties: {
-        results_count: resultsCount,
-        search_status: status,
-      },
+      properties,
     }, firestore).catch(() => {}); // Fire and forget
   };
 }
@@ -428,20 +444,25 @@ export function createLogContextModify(firestore: FirestoreOperations) {
     targetType: string,
     autoConfirm: boolean,
     wasSuccessful: boolean,
-    userEmail?: string
+    userEmail?: string,
+    durationSeconds?: number,
+    toolStatus?: McpToolStatus
   ): void {
+    const properties: Record<string, unknown> = {
+      context_id: contextId,
+      target_type: targetType,
+      auto_confirm: autoConfirm,
+      modification_success: wasSuccessful,
+    };
+    if (durationSeconds !== undefined) properties.duration_seconds = durationSeconds;
+    if (toolStatus !== undefined) properties.status = toolStatus;
     logMcpUsage({
       action: 'mcp_context_modify',
       userId,
       userEmail,
       orgId,
       component: 'context-modify',
-      properties: {
-        context_id: contextId,
-        target_type: targetType,
-        auto_confirm: autoConfirm,
-        modification_success: wasSuccessful,
-      },
+      properties,
     }, firestore).catch(() => {}); // Fire and forget
   };
 }

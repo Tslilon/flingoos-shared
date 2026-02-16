@@ -93,6 +93,11 @@ export type UsageAction = AdminPanelAction | McpAction | VideoForgeAction | Bill
 // ==================== Property Types ====================
 
 /**
+ * MCP tool call outcome for usage logging
+ */
+export type McpToolStatus = 'success' | 'error';
+
+/**
  * Recording source - HOW was the session captured?
  */
 export type RecordingSource = 'screen' | 'camera';
@@ -158,6 +163,8 @@ export interface ChatbotMessageProperties extends BaseEventProperties {
 export interface McpContextListProperties extends BaseEventProperties {
   scope?: string;
   results_count?: number;
+  duration_seconds?: number;
+  status?: McpToolStatus;
 }
 
 /**
@@ -167,6 +174,8 @@ export interface McpContextGetProperties extends BaseEventProperties {
   context_id?: string;
   context_kind?: 'project' | 'session';
   session_type?: string;
+  duration_seconds?: number;
+  status?: McpToolStatus;
 }
 
 /**
@@ -175,6 +184,8 @@ export interface McpContextGetProperties extends BaseEventProperties {
 export interface McpContextSearchProperties extends BaseEventProperties {
   results_count?: number;
   search_status?: string;
+  duration_seconds?: number;
+  status?: McpToolStatus;
 }
 
 /**
@@ -185,6 +196,8 @@ export interface McpContextModifyProperties extends BaseEventProperties {
   target_type?: string;
   auto_confirm?: boolean;
   modification_success?: boolean;
+  duration_seconds?: number;
+  status?: McpToolStatus;
 }
 
 /**
