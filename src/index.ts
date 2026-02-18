@@ -14,6 +14,7 @@ export * from './stage-messages.js';
 export * from './video-artifacts.js';
 export * from './session-translations.js';
 export * from './project.js';
+export * from './edit-history.js';
 
 // Usage logging module (explicit namespace to avoid conflicts)
 export * as UsageLogging from './usage-logging/index.js';
@@ -185,6 +186,9 @@ export type {
   ContextSearchResult,
   ContextListOutput
 } from './project.js';
+
+export type { EditHistorySource, EditHistoryVersion } from './edit-history.js';
+export { EDIT_HISTORY_CAP } from './edit-history.js';
 
 export {
   ProjectSchema,
