@@ -10,6 +10,7 @@ export type EditHistorySource = 'mcp' | 'admin_ui' | 'rename' | 'enrich' | 'rest
 export interface EditHistoryVersion {
   timestamp: string;
   modified_by?: string;
+  modified_by_email?: string;
   source: EditHistorySource;
   source_label?: string;
   action: 'modify' | 'add' | 'delete' | 'restore';
